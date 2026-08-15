@@ -32,6 +32,9 @@ export const Zgloszenia: CollectionConfig = {
       pl: "Wpłatę dopisuje się na karcie zgłoszenia (sekcja Wpłaty) — status „Potwierdzone” ustawia się wtedy sam.",
       en: "",
     },
+    components: {
+      beforeListTable: ["/components/admin/FiltrZgloszen#FiltrZgloszen"],
+    },
   },
   hooks: {
     beforeChange: [

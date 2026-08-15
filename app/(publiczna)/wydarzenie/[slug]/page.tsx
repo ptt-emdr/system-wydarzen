@@ -45,7 +45,12 @@ export default async function StronaWydarzenia({
     return { nazwa: t.nazwa, data: t.data, cena: t.cenaTerminu ?? cena, wolne, zamkniete };
   });
   const wolneWydarzenia = w.limitMiejsc ? Math.max(w.limitMiejsc - lacznie, 0) : null;
-  const brakMiejsc = w.trybZapisu === "wydarzenie" && wolneWydarzenia === 0;
+  /* limit wyczerpany: dla pojedynczego wydarzenia — limit ogólny;
+     dla cyklu — wszystkie terminy pełne lub po dacie zamknięcia */
+  const brakMiejsc =
+    w.trybZapisu === "wydarzenie"
+      ? wolneWydarzenia === 0
+      : terminyInfo.length > 0 && terminyInfo.every((t) => t.zamkniete);
 
   return (
     <>
@@ -114,10 +119,15 @@ export default async function StronaWydarzenia({
 
         <aside>
           {brakMiejsc ? (
-            <div className="rounded-2xl border border-coral/30 bg-coral/5 p-6 text-center">
-              <p className="font-display text-xl font-semibold text-navy">Brak wolnych miejsc</p>
-              <p className="mt-2 text-ink/70">
-                Limit miejsc został osiągnięty. Napisz do nas — dodamy Cię do listy rezerwowej.
+            <div className="rounded-2xl border border-ink/15 bg-ink/5 p-6 text-center opacity-90">
+              <p className="font-display text-xl font-semibold text-ink/60">
+                Zapisy niedostępne
+              </p>
+              <p className="mt-2 font-semibold text-ink/70">
+                Limit dostępnych miejsc został wyczerpany.
+              </p>
+              <p className="mt-2 text-sm text-ink/60">
+                Napisz do organizatora — w razie zwolnienia miejsca damy znać.
               </p>
             </div>
           ) : (
