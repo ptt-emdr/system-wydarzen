@@ -52,7 +52,8 @@ export function aktualnaCena(w: WydarzenieDoc, teraz = new Date()): {
   return { cena: w.cena };
 }
 
-/** Liczba nieanulowanych zgłoszeń: łącznie i per termin. */
+/** Zajęte miejsca (łącznie i per termin) — bez anulowanych i bez listy
+ *  rezerwowej (rezerwowi nie zajmują miejsc). */
 export async function zajetosc(
   payload: Payload,
   wydarzenieId: number | string,
@@ -62,7 +63,7 @@ export async function zajetosc(
     where: {
       and: [
         { wydarzenie: { equals: wydarzenieId } },
-        { status: { not_equals: "anulowane" } },
+        { status: { not_in: ["anulowane", "rezerwowa"] } },
       ],
     },
     limit: 2000,

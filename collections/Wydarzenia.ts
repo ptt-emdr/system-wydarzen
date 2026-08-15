@@ -30,6 +30,9 @@ export const Wydarzenia: CollectionConfig = {
       pl: "Wydarzenie pojawia się na stronie zapisów dopiero po zaznaczeniu „Opublikowane”.",
       en: "Visible publicly only when published.",
     },
+    components: {
+      beforeListTable: ["/components/admin/LinkPanelu#LinkPanelu"],
+    },
   },
   hooks: {
     beforeChange: [
@@ -45,6 +48,26 @@ export const Wydarzenia: CollectionConfig = {
       type: "text",
       required: true,
       label: { pl: "Nazwa wydarzenia", en: "Title" },
+    },
+    {
+      name: "typ",
+      type: "select",
+      required: true,
+      defaultValue: "szkolenie",
+      label: { pl: "Typ wydarzenia", en: "Event type" },
+      options: [
+        { value: "konferencja", label: { pl: "Konferencja", en: "Conference" } },
+        { value: "szkolenie", label: { pl: "Szkolenie", en: "Training" } },
+        { value: "superwizja", label: { pl: "Superwizja", en: "Supervision" } },
+        { value: "cykl", label: { pl: "Cykl (szkoleń/superwizji)", en: "Series" } },
+        { value: "webinar", label: { pl: "Webinar", en: "Webinar" } },
+        { value: "spotkanie", label: { pl: "Spotkanie", en: "Meeting" } },
+        { value: "inne", label: { pl: "Inne", en: "Other" } },
+      ],
+      admin: {
+        position: "sidebar",
+        description: { pl: "Do statystyk i raportów zbiorczych.", en: "" },
+      },
     },
     {
       name: "slug",
@@ -90,7 +113,7 @@ export const Wydarzenia: CollectionConfig = {
               where: {
                 and: [
                   { wydarzenie: { equals: data.id } },
-                  { status: { not_equals: "anulowane" } },
+                  { status: { not_in: ["anulowane", "rezerwowa"] } },
                 ],
               },
             });
@@ -173,6 +196,19 @@ export const Wydarzenia: CollectionConfig = {
           },
         },
       ],
+    },
+    {
+      name: "listaRezerwowa",
+      type: "checkbox",
+      defaultValue: false,
+      label: { pl: "Po wyczerpaniu limitu przyjmuj na listę rezerwową", en: "Waitlist" },
+      admin: {
+        position: "sidebar",
+        description: {
+          pl: "Włączone: zamiast blokady zapisów formularz przyjmuje zgłoszenia na listę rezerwową (bez instrukcji płatności). Przesunięcie na listę główną: na karcie zgłoszenia zmień status na „Oczekuje na wpłatę” — uczestnik dostanie wtedy e-mail z płatnością i terminem.",
+          en: "",
+        },
+      },
     },
     {
       name: "progiCenowe",

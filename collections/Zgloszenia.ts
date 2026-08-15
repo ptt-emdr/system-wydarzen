@@ -38,22 +38,96 @@ export const Zgloszenia: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, operation }) => {
+      async ({ data, operation, originalDoc, req }) => {
         if (!data) return data;
         if (operation === "create") {
           data.token = crypto.randomBytes(16).toString("hex");
         }
-        /* status nadąża za wpłatami: suma wpłat >= należność → Potwierdzone */
+        /* status nadąża za wpłatami TYLKO na osi oczekuje↔potwierdzone;
+           statusy ręczne (rezerwowa, obecny, nieobecny, anulowane) są
+           nienaruszalne dla automatu */
         const wplacono = (data.wplaty || []).reduce(
           (s: number, w: { kwota?: number }) => s + (w.kwota || 0),
           0,
         );
         data.wplacono = wplacono;
-        if (data.status !== "anulowane" && data.status !== "obecny") {
+        const reczne = ["anulowane", "obecny", "nieobecny", "rezerwowa"];
+        if (!reczne.includes(data.status)) {
           data.status =
             wplacono >= (data.kwotaNalezna || 0) ? "potwierdzone" : "oczekuje";
         }
+        /* przesunięcie z listy rezerwowej na główną: nadaj termin
+           płatności od dziś (wg dniNaPlatnosc wydarzenia) */
+        if (
+          operation === "update" &&
+          originalDoc?.status === "rezerwowa" &&
+          data.status !== "rezerwowa" &&
+          data.status !== "anulowane" &&
+          (data.kwotaNalezna || 0) > 0
+        ) {
+          const idWydarzenia =
+            typeof data.wydarzenie === "object" ? data.wydarzenie?.id : data.wydarzenie;
+          let dni = 3;
+          try {
+            const w = await req.payload.findByID({
+              collection: "wydarzenia",
+              id: idWydarzenia,
+              depth: 0,
+              overrideAccess: true,
+            });
+            dni = (w as { dniNaPlatnosc?: number }).dniNaPlatnosc || 3;
+          } catch {}
+          data.terminPlatnosci = new Date(
+            Date.now() + dni * 24 * 60 * 60 * 1000,
+          ).toISOString();
+          req.context.zaproszenieZListy = true; // sygnał dla afterChange
+        }
         return data;
+      },
+    ],
+    afterChange: [
+      /* e-mail z instrukcją płatności po przesunięciu z listy rezerwowej */
+      async ({ doc, req }) => {
+        if (!req.context.zaproszenieZListy) return;
+        delete req.context.zaproszenieZListy;
+        try {
+          const w = (await req.payload.findByID({
+            collection: "wydarzenia",
+            id: typeof doc.wydarzenie === "object" ? doc.wydarzenie.id : doc.wydarzenie,
+            depth: 0,
+            overrideAccess: true,
+          })) as { tytul: string };
+          const u = (await req.payload.findGlobal({ slug: "ustawienia" })) as {
+            rachunek?: { numer?: string; odbiorca?: string };
+            emailKontaktowy?: string;
+          };
+          const termin = doc.terminPlatnosci
+            ? new Date(doc.terminPlatnosci).toLocaleDateString("pl-PL", {
+                day: "numeric", month: "long", year: "numeric",
+              })
+            : null;
+          const brakuje = Math.max((doc.kwotaNalezna || 0) - (doc.wplacono || 0), 0);
+          await req.payload.sendEmail({
+            to: doc.email,
+            subject: `Zwolniło się miejsce: ${w.tytul}`,
+            html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
+              <p>Dzień dobry ${doc.imie},</p>
+              <p>dobra wiadomość — zwolniło się miejsce na <b>${w.tytul}</b>
+              i Twoje zgłoszenie zostało przeniesione z listy rezerwowej na listę główną.</p>
+              <p>Aby potwierdzić udział, prosimy o przelew${termin ? ` do <b>${termin}</b>` : ""}:</p>
+              <table cellpadding="6" style="border-collapse:collapse;background:#f7f3e6;border-radius:8px">
+                <tr><td>Kwota</td><td><b>${brakuje.toLocaleString("pl-PL", { minimumFractionDigits: 2 })} zł</b></td></tr>
+                <tr><td>Rachunek</td><td><b>${u.rachunek?.numer || ""}</b></td></tr>
+                <tr><td>Odbiorca</td><td>${(u.rachunek?.odbiorca || "").replace(/\n/g, "<br>")}</td></tr>
+                <tr><td>Tytuł przelewu</td><td><b style="color:#ff370f">${doc.kodPlatnosci || ""}</b></td></tr>
+              </table>
+              <p>Brak wpłaty w terminie oznacza ponowne zwolnienie miejsca.</p>
+              <p>W razie pytań: ${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</p>
+            </div>`,
+          });
+        } catch (e) {
+          console.error("E-mail o przesunięciu z listy nie wyszedł:", e);
+        }
       },
     ],
     beforeValidate: [
@@ -105,10 +179,33 @@ export const Zgloszenia: CollectionConfig = {
       options: [
         { value: "oczekuje", label: { pl: "Oczekuje na wpłatę", en: "Awaiting payment" } },
         { value: "potwierdzone", label: { pl: "Potwierdzone (opłacone)", en: "Confirmed" } },
+        { value: "rezerwowa", label: { pl: "Lista rezerwowa", en: "Waitlist" } },
         { value: "obecny", label: { pl: "Obecny (po wydarzeniu)", en: "Attended" } },
+        { value: "nieobecny", label: { pl: "Nieobecny (po wydarzeniu)", en: "No-show" } },
         { value: "anulowane", label: { pl: "Anulowane", en: "Cancelled" } },
       ],
-      admin: { position: "sidebar" },
+      admin: {
+        position: "sidebar",
+        description: {
+          pl: "Obecny/Nieobecny uzupełnia się po wydarzeniu — certyfikaty można wysłać wyłącznie Obecnym. Zmiana z Listy rezerwowej na „Oczekuje” wysyła e-mail z płatnością i terminem.",
+          en: "",
+        },
+      },
+    },
+    {
+      name: "powodAnulowania",
+      type: "select",
+      label: { pl: "Powód anulowania", en: "Cancel reason" },
+      options: [
+        { value: "rezygnacja", label: { pl: "Rezygnacja uczestnika", en: "Withdrawal" } },
+        { value: "brak-platnosci", label: { pl: "Brak płatności w terminie", en: "No payment" } },
+        { value: "zwrot", label: { pl: "Anulowane ze zwrotem", en: "Refunded" } },
+        { value: "inny", label: { pl: "Inny", en: "Other" } },
+      ],
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.status === "anulowane",
+      },
     },
     {
       type: "row",

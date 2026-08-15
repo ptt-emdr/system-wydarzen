@@ -41,6 +41,7 @@ export async function POST(req: Request) {
 
     /* ---- terminy i limity ---- */
     let wybrane: string[] = [];
+    let naListeRezerwowa = false;
     const { lacznie, naTermin } = await zajetosc(payload, w.id);
     if (w.trybZapisu === "terminy") {
       try {
@@ -64,7 +65,11 @@ export async function POST(req: Request) {
         }
       }
     } else if (w.limitMiejsc && lacznie >= w.limitMiejsc) {
-      return Response.json({ blad: "Brak wolnych miejsc." }, { status: 409 });
+      if ((w as { listaRezerwowa?: boolean }).listaRezerwowa) {
+        naListeRezerwowa = true; // zapis przyjęty, ale na listę rezerwową
+      } else {
+        return Response.json({ blad: "Brak wolnych miejsc." }, { status: 409 });
+      }
     }
 
     /* ---- odpowiedzi i załączniki wg kreatora pól ---- */
@@ -108,8 +113,10 @@ export async function POST(req: Request) {
     /* ---- kwota i termin płatności ---- */
     const kwotaNalezna =
       w.trybZapisu === "terminy" ? kwotaZaTerminy(w, wybrane) : aktualnaCena(w).cena;
+    /* lista rezerwowa: bez terminu płatności — płatność dopiero po
+       przesunięciu na listę główną przez obsługę */
     const terminPlatnosci =
-      kwotaNalezna > 0
+      kwotaNalezna > 0 && !naListeRezerwowa
         ? new Date(Date.now() + w.dniNaPlatnosc * 24 * 60 * 60 * 1000)
         : null;
 
@@ -121,6 +128,7 @@ export async function POST(req: Request) {
         nazwisko,
         email,
         telefon,
+        ...(naListeRezerwowa ? { status: "rezerwowa" } : {}),
         wydarzenie: Number(wydarzenieId) || wydarzenieId,
         wybraneTerminy: wybrane.map((nazwa) => ({ nazwa })),
         odpowiedzi,
@@ -162,8 +170,12 @@ export async function POST(req: Request) {
     const bazaUrl = process.env.PUBLIC_URL || "http://localhost:3100";
     const linkProfilu = `${bazaUrl}/profil/${zgloszenie.id}/${zgloszenie.token}`;
 
-    const platnoscHtml =
-      kwotaNalezna > 0
+    const platnoscHtml = naListeRezerwowa
+      ? `<p><b>Twoje zgłoszenie trafiło na LISTĘ REZERWOWĄ</b> — limit miejsc
+         jest w tej chwili wyczerpany. Nie dokonuj jeszcze żadnej wpłaty.
+         Jeżeli zwolni się miejsce, otrzymasz e-mail z potwierdzeniem
+         i danymi do przelewu.</p>`
+      : kwotaNalezna > 0
         ? `<p>Aby potwierdzić udział, prosimy o przelew${terminTekst ? ` do <b>${terminTekst}</b>` : ""}:</p>
            <table cellpadding="6" style="border-collapse:collapse;background:#f7f3e6;border-radius:8px">
              <tr><td>Kwota</td><td><b>${formatujKwote(kwotaNalezna)}</b></td></tr>
@@ -178,7 +190,9 @@ export async function POST(req: Request) {
     try {
       await payload.sendEmail({
         to: email,
-        subject: `Zgłoszenie przyjęte: ${w.tytul}`,
+        subject: naListeRezerwowa
+          ? `Lista rezerwowa: ${w.tytul}`
+          : `Zgłoszenie przyjęte: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
           <p>Dzień dobry ${imie},</p>
           <p>dziękujemy za zgłoszenie na <b>${w.tytul}</b>${
@@ -203,6 +217,7 @@ export async function POST(req: Request) {
       terminPlatnosci: terminTekst,
       linkProfilu,
       bezplatne: kwotaNalezna === 0,
+      rezerwowa: naListeRezerwowa,
     });
   } catch (e) {
     console.error("Błąd przyjmowania zgłoszenia:", e);

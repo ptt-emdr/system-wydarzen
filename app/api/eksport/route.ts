@@ -32,11 +32,13 @@ export async function GET(req: Request) {
   const statusy: Record<string, string> = {
     oczekuje: "oczekuje na wpłatę",
     potwierdzone: "potwierdzone",
+    rezerwowa: "lista rezerwowa",
     obecny: "obecny",
+    nieobecny: "nieobecny",
     anulowane: "anulowane",
   };
 
-  const wiersze = docs.map((z) => {
+  const dane = docs.map((z) => {
     const d = z as Record<string, unknown> & {
       wydarzenie?: { tytul?: string };
       wybraneTerminy?: { nazwa: string }[];
@@ -44,21 +46,47 @@ export async function GET(req: Request) {
       faktura?: { nazwa?: string; nip?: string };
     };
     return [
-      pole(d.nazwisko), pole(d.imie), pole(d.email), pole(d.telefon),
-      pole(typeof d.wydarzenie === "object" ? d.wydarzenie?.tytul : d.wydarzenie),
-      pole((d.wybraneTerminy || []).map((t) => t.nazwa).join("; ")),
-      pole(statusy[String(d.status)] || d.status),
-      pole(d.kwotaNalezna), pole(d.wplacono),
-      pole(d.terminPlatnosci ? new Date(String(d.terminPlatnosci)).toLocaleDateString("pl-PL") : ""),
-      pole(d.kodPlatnosci),
-      pole(d.chceFakture ? d.faktura?.nazwa || "tak" : ""),
-      pole(d.faktura?.nip),
-      pole((d.odpowiedzi || []).map((o) => `${o.pytanie}: ${o.odpowiedz}`).join(" | ")),
-    ].join(";");
+      d.nazwisko, d.imie, d.email, d.telefon,
+      typeof d.wydarzenie === "object" ? d.wydarzenie?.tytul : d.wydarzenie,
+      (d.wybraneTerminy || []).map((t) => t.nazwa).join("; "),
+      statusy[String(d.status)] || d.status,
+      d.kwotaNalezna, d.wplacono,
+      d.terminPlatnosci ? new Date(String(d.terminPlatnosci)).toLocaleDateString("pl-PL") : "",
+      d.kodPlatnosci,
+      d.chceFakture ? d.faktura?.nazwa || "tak" : "",
+      d.faktura?.nip,
+      (d.odpowiedzi || []).map((o) => `${o.pytanie}: ${o.odpowiedz}`).join(" | "),
+    ];
   });
 
-  /* BOM + średniki = polski Excel otwiera poprawnie od dwukliku */
-  const csv = "﻿" + [naglowki.join(";"), ...wiersze].join("\r\n");
+  /* ---- XLSX (Excel) ---- */
+  if (url.searchParams.get("format") === "xlsx") {
+    const { default: ExcelJS } = await import("exceljs");
+    const zeszyt = new ExcelJS.Workbook();
+    const arkusz = zeszyt.addWorksheet("Uczestnicy");
+    arkusz.addRow(naglowki);
+    arkusz.getRow(1).font = { bold: true };
+    for (const w of dane) arkusz.addRow(w);
+    arkusz.columns.forEach((k, i) => {
+      k.width = Math.min(
+        Math.max(naglowki[i].length, ...dane.map((w) => String(w[i] ?? "").length)) + 2,
+        50,
+      );
+    });
+    const bufor = await zeszyt.xlsx.writeBuffer();
+    return new Response(bufor, {
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename="zgloszenia-${wydarzenieId || "wszystkie"}.xlsx"`,
+      },
+    });
+  }
+
+  /* ---- CSV: BOM + średniki = polski Excel otwiera od dwukliku ---- */
+  const csv =
+    "﻿" +
+    [naglowki.join(";"), ...dane.map((w) => w.map(pole).join(";"))].join("\r\n");
   return new Response(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",

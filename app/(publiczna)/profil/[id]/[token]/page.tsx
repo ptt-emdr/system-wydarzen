@@ -48,7 +48,9 @@ export default async function ProfilUczestnika({
   const statusInfo: Record<string, { tekst: string; klasa: string }> = {
     oczekuje: { tekst: "Oczekuje na wpłatę", klasa: "bg-sun text-ink" },
     potwierdzone: { tekst: "Potwierdzone — do zobaczenia!", klasa: "bg-brand text-white" },
+    rezerwowa: { tekst: "Lista rezerwowa — nie dokonuj wpłaty", klasa: "bg-navy text-white" },
     obecny: { tekst: "Udział potwierdzony (obecność)", klasa: "bg-brand-deep text-white" },
+    nieobecny: { tekst: "Odnotowano nieobecność", klasa: "bg-ink/60 text-white" },
     anulowane: { tekst: "Zgłoszenie anulowane", klasa: "bg-coral/80 text-white" },
   };
   const st = statusInfo[z.status || "oczekuje"];

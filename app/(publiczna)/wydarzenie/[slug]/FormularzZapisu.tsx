@@ -21,6 +21,7 @@ type Props = {
     dniNaPlatnosc: number;
   };
   klauzulaRodo: string;
+  trybRezerwowy?: boolean;
 };
 
 type Potwierdzenie = {
@@ -31,11 +32,12 @@ type Potwierdzenie = {
   terminPlatnosci: string | null;
   linkProfilu: string;
   bezplatne: boolean;
+  rezerwowa?: boolean;
 };
 
 const kwota = (zl: number) => zl.toLocaleString("pl-PL", { minimumFractionDigits: 2 }) + " zł";
 
-export function FormularzZapisu({ wydarzenie, klauzulaRodo }: Props) {
+export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Props) {
   const [wybraneTerminy, setWybraneTerminy] = useState<string[]>([]);
   const [chceFakture, setChceFakture] = useState(false);
   const [wysylanie, setWysylanie] = useState(false);
@@ -76,9 +78,16 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo }: Props) {
     return (
       <div className="rounded-2xl border border-brand/30 bg-mist p-6 shadow-soft">
         <h2 className="font-display text-2xl font-semibold text-navy">
-          Dziękujemy — zgłoszenie przyjęte!
+          {ok.rezerwowa ? "Jesteś na liście rezerwowej" : "Dziękujemy — zgłoszenie przyjęte!"}
         </h2>
-        {ok.bezplatne ? (
+        {ok.rezerwowa ? (
+          <p className="mt-3 text-ink/80">
+            Limit miejsc jest wyczerpany, więc Twoje zgłoszenie trafiło na{" "}
+            <b>listę rezerwową</b>. <b>Nie dokonuj jeszcze wpłaty.</b> Jeżeli
+            zwolni się miejsce, otrzymasz e-mail z potwierdzeniem i danymi do
+            przelewu.
+          </p>
+        ) : ok.bezplatne ? (
           <p className="mt-3 text-ink/80">
             Udział w wydarzeniu jest bezpłatny — Twoje miejsce jest już
             potwierdzone. Szczegóły wysłaliśmy na podany adres e-mail.
@@ -133,7 +142,18 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo }: Props) {
       onSubmit={wyslij}
       className="space-y-4 rounded-2xl border border-ink/10 bg-white p-6 shadow-lift"
     >
-      <h2 className="font-display text-2xl font-semibold text-navy">Zapisz się</h2>
+      <h2 className="font-display text-2xl font-semibold text-navy">
+        {trybRezerwowy ? "Zapisz się na listę rezerwową" : "Zapisz się"}
+      </h2>
+
+      {trybRezerwowy ? (
+        <p className="rounded-xl border border-sun bg-sun/15 p-3 text-sm font-semibold text-ink">
+          Miejsca na to wydarzenie są niedostępne — limit został wyczerpany.
+          Zapisujesz się na <b>listę rezerwową</b>: nie płacisz teraz nic;
+          jeżeli zwolni się miejsce, otrzymasz e-mail z potwierdzeniem
+          i danymi do przelewu.
+        </p>
+      ) : null}
 
       {wydarzenie.trybZapisu === "terminy" ? (
         <fieldset className="space-y-2">
@@ -277,11 +297,13 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo }: Props) {
       >
         {wysylanie
           ? "Wysyłanie…"
-          : doZaplaty > 0
-            ? `Zapisuję się — do zapłaty ${kwota(doZaplaty)}`
-            : "Zapisuję się"}
+          : trybRezerwowy
+            ? "Zapisuję się na listę rezerwową"
+            : doZaplaty > 0
+              ? `Zapisuję się — do zapłaty ${kwota(doZaplaty)}`
+              : "Zapisuję się"}
       </button>
-      {doZaplaty > 0 ? (
+      {!trybRezerwowy && doZaplaty > 0 ? (
         <p className="text-center text-xs text-ink/60">
           Po zapisaniu otrzymasz dane do przelewu ({wydarzenie.dniNaPlatnosc}{" "}
           {wydarzenie.dniNaPlatnosc === 1 ? "dzień" : "dni"} na płatność).

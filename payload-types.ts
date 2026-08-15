@@ -134,6 +134,7 @@ export interface UserAuthOperations {
 export interface Wydarzenia {
   id: number;
   tytul: string;
+  typ: 'konferencja' | 'szkolenie' | 'superwizja' | 'cykl' | 'webinar' | 'spotkanie' | 'inne';
   /**
    * URL part; auto-generated when empty.
    */
@@ -150,6 +151,7 @@ export interface Wydarzenia {
   cena: number;
   dniNaPlatnosc: number;
   limitMiejsc?: number | null;
+  listaRezerwowa?: boolean | null;
   /**
    * Optional time-based prices.
    */
@@ -204,7 +206,8 @@ export interface Zgloszenia {
         id?: string | null;
       }[]
     | null;
-  status: 'oczekuje' | 'potwierdzone' | 'obecny' | 'anulowane';
+  status: 'oczekuje' | 'potwierdzone' | 'rezerwowa' | 'obecny' | 'nieobecny' | 'anulowane';
+  powodAnulowania?: ('rezygnacja' | 'brak-platnosci' | 'zwrot' | 'inny') | null;
   kwotaNalezna: number;
   wplacono?: number | null;
   terminPlatnosci?: string | null;
@@ -371,6 +374,7 @@ export interface PayloadMigration {
  */
 export interface WydarzeniaSelect<T extends boolean = true> {
   tytul?: T;
+  typ?: T;
   slug?: T;
   opublikowane?: T;
   liczbaZapisanych?: T;
@@ -381,6 +385,7 @@ export interface WydarzeniaSelect<T extends boolean = true> {
   cena?: T;
   dniNaPlatnosc?: T;
   limitMiejsc?: T;
+  listaRezerwowa?: T;
   progiCenowe?:
     | T
     | {
@@ -432,6 +437,7 @@ export interface ZgloszeniaSelect<T extends boolean = true> {
         id?: T;
       };
   status?: T;
+  powodAnulowania?: T;
   kwotaNalezna?: T;
   wplacono?: T;
   terminPlatnosci?: T;

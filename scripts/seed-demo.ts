@@ -12,6 +12,7 @@ async function seed() {
   const cykl = {
     tytul: "Cykl superwizji EMDR Dzieci i Młodzieży — jesień 2026",
     slug: "cykl-superwizji-dim-jesien-2026",
+    typ: "cykl" as const,
     opublikowane: true,
     dataOd: "2026-10-10T16:00:00.000Z",
     dataDo: "2026-12-12T18:00:00.000Z",
@@ -52,7 +53,9 @@ async function seed() {
   const spotkanie = {
     tytul: "Spotkanie informacyjne o ścieżce certyfikacyjnej PTT EMDR",
     slug: "spotkanie-informacyjne-certyfikacja",
+    typ: "spotkanie" as const,
     opublikowane: true,
+    listaRezerwowa: true,
     dataOd: "2026-09-24T17:00:00.000Z",
     miejsce: "online",
     opis:

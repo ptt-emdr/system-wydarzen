@@ -7,7 +7,13 @@ import { useEffect, useState } from "react";
  * + licznik aktualnie zapisanych na wybrane wydarzenie.
  */
 type Wydarzenie = { id: number | string; tytul: string };
-type Liczby = { zapisani: number; potwierdzeni: number; oczekuja: number; limit: number | null };
+type Liczby = {
+  zapisani: number;
+  potwierdzeni: number;
+  oczekuja: number;
+  rezerwowa: number;
+  limit: number | null;
+};
 
 export function FiltrZgloszen() {
   const [wydarzenia, setWydarzenia] = useState<Wydarzenie[]>([]);
@@ -39,19 +45,19 @@ export function FiltrZgloszen() {
       return (await r.json()).totalDocs as number;
     };
     (async () => {
-      const [zapisani, potwierdzeni, anulowani] = await Promise.all([
-        zapytaj("&where[status][not_equals]=anulowane"),
-        zapytaj("&where[status][in]=potwierdzone,obecny"),
-        zapytaj("&where[status][equals]=anulowane"),
+      const [zapisani, potwierdzeni, rezerwowa] = await Promise.all([
+        zapytaj("&where[status][not_in]=anulowane,rezerwowa"),
+        zapytaj("&where[status][in]=potwierdzone,obecny,nieobecny"),
+        zapytaj("&where[status][equals]=rezerwowa"),
       ]);
       const w = await fetch(`/api/wydarzenia/${wybrane}?depth=0`, { credentials: "include" }).then(
         (r) => r.json(),
       );
-      void anulowani;
       setLiczby({
         zapisani,
         potwierdzeni,
         oczekuja: zapisani - potwierdzeni,
+        rezerwowa,
         limit: w.limitMiejsc || null,
       });
     })();
@@ -99,6 +105,7 @@ export function FiltrZgloszen() {
           <b>Zapisanych: {liczby.zapisani}</b>
           {liczby.limit ? ` / limit ${liczby.limit}` : ""} · opłaconych:{" "}
           {liczby.potwierdzeni} · oczekuje na wpłatę: {liczby.oczekuja}
+          {liczby.rezerwowa > 0 ? ` · lista rezerwowa: ${liczby.rezerwowa}` : ""}
         </span>
       ) : null}
     </div>

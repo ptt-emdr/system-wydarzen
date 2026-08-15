@@ -51,6 +51,11 @@ export default async function StronaWydarzenia({
     w.trybZapisu === "wydarzenie"
       ? wolneWydarzenia === 0
       : terminyInfo.length > 0 && terminyInfo.every((t) => t.zamkniete);
+  /* opcja per wydarzenie: pełny limit → zapisy na listę rezerwową */
+  const trybRezerwowy =
+    brakMiejsc &&
+    w.trybZapisu === "wydarzenie" &&
+    Boolean((w as { listaRezerwowa?: boolean }).listaRezerwowa);
 
   return (
     <>
@@ -118,7 +123,7 @@ export default async function StronaWydarzenia({
         </article>
 
         <aside>
-          {brakMiejsc ? (
+          {brakMiejsc && !trybRezerwowy ? (
             <div className="rounded-2xl border border-ink/15 bg-ink/5 p-6 text-center opacity-90">
               <p className="font-display text-xl font-semibold text-ink/60">
                 Zapisy niedostępne
@@ -143,6 +148,7 @@ export default async function StronaWydarzenia({
                 dniNaPlatnosc: w.dniNaPlatnosc,
               }}
               klauzulaRodo={(ustawienia as { klauzulaRodo?: string }).klauzulaRodo || ""}
+              trybRezerwowy={trybRezerwowy}
             />
           )}
         </aside>
