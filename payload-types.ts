@@ -139,7 +139,7 @@ export interface Wydarzenia {
    */
   slug?: string | null;
   opublikowane?: boolean | null;
-  liczbaZapisanych?: number | null;
+  liczbaZapisanych?: string | null;
   dataOd: string;
   dataDo?: string | null;
   miejsce?: string | null;

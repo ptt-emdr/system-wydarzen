@@ -70,18 +70,21 @@ export const Wydarzenia: CollectionConfig = {
       /* pole wirtualne: nie jest zapisywane w bazie — liczy się przy
          każdym odczycie z nieanulowanych zgłoszeń (kolumna na liście) */
       name: "liczbaZapisanych",
-      type: "number",
+      type: "text",
       virtual: true,
       label: { pl: "Zapisani", en: "Registered" },
       admin: {
         position: "sidebar",
         readOnly: true,
-        description: { pl: "Aktualna liczba zapisanych (bez anulowanych).", en: "" },
+        description: {
+          pl: "Aktualna liczba zapisanych (bez anulowanych); przy włączonym limicie: „zapisani / limit”.",
+          en: "",
+        },
       },
       hooks: {
         afterRead: [
           async ({ data, req }) => {
-            if (!data?.id) return 0;
+            if (!data?.id) return "0";
             const wynik = await req.payload.count({
               collection: "zgloszenia",
               where: {
@@ -91,7 +94,9 @@ export const Wydarzenia: CollectionConfig = {
                 ],
               },
             });
-            return wynik.totalDocs;
+            return data.limitMiejsc
+              ? `${wynik.totalDocs} / ${data.limitMiejsc}`
+              : String(wynik.totalDocs);
           },
         ],
       },
