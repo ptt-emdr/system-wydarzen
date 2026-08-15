@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta PTT EMDR — identyczna ze stroną Towarzystwa */
+  --color-brand: #4295b7;
+  --color-brand-dark: #367b99;
+  --color-brand-deep: #2c667f;
+  --color-navy: #1d3d76;
+  --color-sky: #2581c4;
+  --color-sun: #fbbb15;
+  --color-coral: #ff370f;
+  --color-cream: #f7f3e6;
+  --color-mist: #eef6fa;
+  --color-ink: #16303c;
+
+  --shadow-lift: 0 24px 48px -12px rgb(22 48 60 / 0.14);
+  --shadow-soft: 0 8px 30px -6px rgb(22 48 60 / 0.1);
+}
+
+@theme inline {
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-ink antialiased;
+}
+
+::selection {
+  background: var(--color-sun);
+  color: var(--color-ink);
+}
