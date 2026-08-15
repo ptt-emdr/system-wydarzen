@@ -33,6 +33,7 @@ type Potwierdzenie = {
   linkProfilu: string;
   bezplatne: boolean;
   rezerwowa?: boolean;
+  akceptacja?: boolean;
 };
 
 const kwota = (zl: number) => zl.toLocaleString("pl-PL", { minimumFractionDigits: 2 }) + " zł";
@@ -78,9 +79,20 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
     return (
       <div className="rounded-2xl border border-brand/30 bg-mist p-6 shadow-soft">
         <h2 className="font-display text-2xl font-semibold text-navy">
-          {ok.rezerwowa ? "Jesteś na liście rezerwowej" : "Dziękujemy — zgłoszenie przyjęte!"}
+          {ok.rezerwowa
+            ? "Jesteś na liście rezerwowej"
+            : ok.akceptacja
+              ? "Zgłoszenie przyjęte do weryfikacji"
+              : "Dziękujemy — zgłoszenie przyjęte!"}
         </h2>
-        {ok.rezerwowa ? (
+        {ok.akceptacja ? (
+          <p className="mt-3 text-ink/80">
+            Twoje zgłoszenie czeka na <b>weryfikację przez organizatora</b>{" "}
+            (m.in. sprawdzenie załączonych dokumentów).{" "}
+            <b>Nie dokonuj jeszcze wpłaty</b> — po akceptacji otrzymasz e-mail
+            z potwierdzeniem{ok.kwota > 0 ? " i danymi do przelewu" : ""}.
+          </p>
+        ) : ok.rezerwowa ? (
           <p className="mt-3 text-ink/80">
             Limit miejsc jest wyczerpany, więc Twoje zgłoszenie trafiło na{" "}
             <b>listę rezerwową</b>. <b>Nie dokonuj jeszcze wpłaty.</b> Jeżeli

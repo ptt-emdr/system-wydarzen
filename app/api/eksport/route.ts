@@ -30,11 +30,13 @@ export async function GET(req: Request) {
   ];
   const pole = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const statusy: Record<string, string> = {
+    doAkceptacji: "do akceptacji",
     oczekuje: "oczekuje na wpłatę",
     potwierdzone: "potwierdzone",
     rezerwowa: "lista rezerwowa",
     obecny: "obecny",
     nieobecny: "nieobecny",
+    odrzucone: "odrzucone",
     anulowane: "anulowane",
   };
 

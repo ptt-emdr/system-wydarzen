@@ -63,7 +63,7 @@ export async function zajetosc(
     where: {
       and: [
         { wydarzenie: { equals: wydarzenieId } },
-        { status: { not_in: ["anulowane", "rezerwowa"] } },
+        { status: { not_in: ["anulowane", "rezerwowa", "odrzucone"] } },
       ],
     },
     limit: 2000,

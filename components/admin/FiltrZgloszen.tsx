@@ -12,6 +12,7 @@ type Liczby = {
   potwierdzeni: number;
   oczekuja: number;
   rezerwowa: number;
+  doAkceptacji: number;
   limit: number | null;
 };
 
@@ -45,10 +46,11 @@ export function FiltrZgloszen() {
       return (await r.json()).totalDocs as number;
     };
     (async () => {
-      const [zapisani, potwierdzeni, rezerwowa] = await Promise.all([
-        zapytaj("&where[status][not_in]=anulowane,rezerwowa"),
+      const [zapisani, potwierdzeni, rezerwowa, doAkceptacji] = await Promise.all([
+        zapytaj("&where[status][not_in]=anulowane,rezerwowa,odrzucone"),
         zapytaj("&where[status][in]=potwierdzone,obecny,nieobecny"),
         zapytaj("&where[status][equals]=rezerwowa"),
+        zapytaj("&where[status][equals]=doAkceptacji"),
       ]);
       const w = await fetch(`/api/wydarzenia/${wybrane}?depth=0`, { credentials: "include" }).then(
         (r) => r.json(),
@@ -56,8 +58,9 @@ export function FiltrZgloszen() {
       setLiczby({
         zapisani,
         potwierdzeni,
-        oczekuja: zapisani - potwierdzeni,
+        oczekuja: zapisani - potwierdzeni - doAkceptacji,
         rezerwowa,
+        doAkceptacji,
         limit: w.limitMiejsc || null,
       });
     })();
@@ -105,6 +108,7 @@ export function FiltrZgloszen() {
           <b>Zapisanych: {liczby.zapisani}</b>
           {liczby.limit ? ` / limit ${liczby.limit}` : ""} · opłaconych:{" "}
           {liczby.potwierdzeni} · oczekuje na wpłatę: {liczby.oczekuja}
+          {liczby.doAkceptacji > 0 ? ` · do akceptacji: ${liczby.doAkceptacji}` : ""}
           {liczby.rezerwowa > 0 ? ` · lista rezerwowa: ${liczby.rezerwowa}` : ""}
         </span>
       ) : null}

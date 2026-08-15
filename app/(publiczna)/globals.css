@@ -34,3 +34,26 @@ body {
   background: var(--color-sun);
   color: var(--color-ink);
 }
+
+/* ---------- wydruk / PDF Karty wydarzenia ---------- */
+@media print {
+  .bez-druku {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .shadow-soft,
+  .shadow-lift {
+    box-shadow: none !important;
+    border: 1px solid #d5d5d5;
+  }
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}

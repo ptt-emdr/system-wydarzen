@@ -113,7 +113,7 @@ export const Wydarzenia: CollectionConfig = {
               where: {
                 and: [
                   { wydarzenie: { equals: data.id } },
-                  { status: { not_in: ["anulowane", "rezerwowa"] } },
+                  { status: { not_in: ["anulowane", "rezerwowa", "odrzucone"] } },
                 ],
               },
             });
@@ -196,6 +196,19 @@ export const Wydarzenia: CollectionConfig = {
           },
         },
       ],
+    },
+    {
+      name: "akceptacjaUczestnikow",
+      type: "checkbox",
+      defaultValue: false,
+      label: { pl: "Akceptowanie uczestników (weryfikacja przed płatnością)", en: "Approval required" },
+      admin: {
+        position: "sidebar",
+        description: {
+          pl: "Włączone: nowe zgłoszenie trafia do weryfikacji (np. sprawdzenie załączonego dokumentu). Na karcie zgłoszenia pojawiają się przyciski „Akceptuj” / „Odrzuć”; dopiero akceptacja wysyła uczestnikowi dane do przelewu (termin liczony od akceptacji).",
+          en: "",
+        },
+      },
     },
     {
       name: "listaRezerwowa",

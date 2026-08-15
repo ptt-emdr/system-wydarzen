@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { statystykiWydarzenia } from "@/lib/raporty";
 import { zajetosc, formatujDate, formatujKwote, type WydarzenieDoc } from "@/lib/wydarzenia";
 import { PrzypomnijButton } from "./PrzypomnijButton";
+import { DrukujButton } from "./DrukujButton";
 
 export const dynamic = "force-dynamic";
 
@@ -59,14 +60,26 @@ export default async function KartaWydarzenia({
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-brand-dark">
         Karta wydarzenia · {w.typ || "wydarzenie"} · {w.opublikowane ? "opublikowane" : "szkic"}
       </p>
-      <h1 className="mt-1 font-display text-3xl font-semibold text-navy">{w.tytul}</h1>
-      <p className="mt-1 text-ink/70">
-        {formatujDate(w.dataOd)}
-        {w.miejsce ? ` · ${w.miejsce}` : ""}
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="mt-1 font-display text-3xl font-semibold text-navy">{w.tytul}</h1>
+          <p className="mt-1 text-ink/70">
+            {formatujDate(w.dataOd)}
+            {w.miejsce ? ` · ${w.miejsce}` : ""}
+          </p>
+          <p className="mt-1 text-xs text-ink/50">
+            Raport wygenerowany:{" "}
+            {new Date().toLocaleString("pl-PL", {
+              day: "numeric", month: "long", year: "numeric",
+              hour: "2-digit", minute: "2-digit",
+            })}
+          </p>
+        </div>
+        <DrukujButton />
+      </div>
 
       {/* ---------- zakładki (kolejne dochodzą z F2/F3/F4) ---------- */}
-      <nav className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
+      <nav className="bez-druku mt-5 flex flex-wrap gap-2 text-sm font-semibold">
         <span className="rounded-full bg-navy px-4 py-1.5 text-white">Podsumowanie</span>
         <a href={filtrListy} className="rounded-full bg-white px-4 py-1.5 text-brand-deep shadow-soft hover:bg-cream">
           Uczestnicy →
@@ -86,9 +99,10 @@ export default async function KartaWydarzenia({
         <Kafel etykieta="Zapisani" wartosc={s.zapisani} wyroznij />
         <Kafel etykieta="Wolne miejsca" wartosc={wolne ?? "—"} />
         <Kafel etykieta="Lista rezerwowa" wartosc={s.rezerwowa} />
+        <Kafel etykieta="Do akceptacji" wartosc={s.doAkceptacji} />
         <Kafel etykieta="Oczekują na wpłatę" wartosc={s.oczekuja} />
         <Kafel etykieta="Opłaceni" wartosc={s.oplaceni} />
-        <Kafel etykieta="Anulowani" wartosc={s.anulowani} />
+        <Kafel etykieta="Anulowani / odrzuceni" wartosc={`${s.anulowani} / ${s.odrzuceni}`} />
         <Kafel etykieta="Obecni / nieobecni" wartosc={`${s.obecni} / ${s.nieobecni}`} />
       </div>
 
@@ -181,15 +195,17 @@ export default async function KartaWydarzenia({
               </tbody>
             </table>
           </div>
-          <div className="mt-3">
+          <div className="bez-druku mt-3">
             <PrzypomnijButton wydarzenieId={String(w.id)} liczba={s.nieoplaceni.length} />
           </div>
         </>
       )}
 
       {/* ---------- eksporty ---------- */}
-      <h2 className="mt-8 font-display text-xl font-semibold text-navy">Raporty do pobrania</h2>
-      <div className="mt-3 flex flex-wrap gap-3">
+      <h2 className="bez-druku mt-8 font-display text-xl font-semibold text-navy">
+        Raporty do pobrania
+      </h2>
+      <div className="bez-druku mt-3 flex flex-wrap gap-3">
         <a href={`/api/eksport?wydarzenie=${id}&format=xlsx`} className="rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white shadow-soft hover:bg-brand-deep">
           Uczestnicy — Excel (XLSX)
         </a>

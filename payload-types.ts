@@ -151,6 +151,7 @@ export interface Wydarzenia {
   cena: number;
   dniNaPlatnosc: number;
   limitMiejsc?: number | null;
+  akceptacjaUczestnikow?: boolean | null;
   listaRezerwowa?: boolean | null;
   /**
    * Optional time-based prices.
@@ -206,7 +207,9 @@ export interface Zgloszenia {
         id?: string | null;
       }[]
     | null;
-  status: 'oczekuje' | 'potwierdzone' | 'rezerwowa' | 'obecny' | 'nieobecny' | 'anulowane';
+  status:
+    'doAkceptacji' | 'oczekuje' | 'potwierdzone' | 'rezerwowa' | 'obecny' | 'nieobecny' | 'odrzucone' | 'anulowane';
+  powodOdrzucenia?: string | null;
   powodAnulowania?: ('rezygnacja' | 'brak-platnosci' | 'zwrot' | 'inny') | null;
   kwotaNalezna: number;
   wplacono?: number | null;
@@ -385,6 +388,7 @@ export interface WydarzeniaSelect<T extends boolean = true> {
   cena?: T;
   dniNaPlatnosc?: T;
   limitMiejsc?: T;
+  akceptacjaUczestnikow?: T;
   listaRezerwowa?: T;
   progiCenowe?:
     | T
@@ -437,6 +441,7 @@ export interface ZgloszeniaSelect<T extends boolean = true> {
         id?: T;
       };
   status?: T;
+  powodOdrzucenia?: T;
   powodAnulowania?: T;
   kwotaNalezna?: T;
   wplacono?: T;

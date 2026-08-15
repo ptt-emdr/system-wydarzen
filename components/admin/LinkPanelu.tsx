@@ -20,8 +20,8 @@ export function LinkPanelu() {
         style={{
           padding: "10px 22px",
           borderRadius: "999px",
-          background: "#fbbb15",
-          color: "#16303c",
+          background: "#1d3d76",
+          color: "#fff",
           fontWeight: 800,
           fontSize: "15px",
           textDecoration: "none",

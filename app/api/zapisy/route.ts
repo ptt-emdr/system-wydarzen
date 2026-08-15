@@ -42,6 +42,9 @@ export async function POST(req: Request) {
     /* ---- terminy i limity ---- */
     let wybrane: string[] = [];
     let naListeRezerwowa = false;
+    const wymagaAkceptacji = Boolean(
+      (w as { akceptacjaUczestnikow?: boolean }).akceptacjaUczestnikow,
+    );
     const { lacznie, naTermin } = await zajetosc(payload, w.id);
     if (w.trybZapisu === "terminy") {
       try {
@@ -113,10 +116,10 @@ export async function POST(req: Request) {
     /* ---- kwota i termin płatności ---- */
     const kwotaNalezna =
       w.trybZapisu === "terminy" ? kwotaZaTerminy(w, wybrane) : aktualnaCena(w).cena;
-    /* lista rezerwowa: bez terminu płatności — płatność dopiero po
-       przesunięciu na listę główną przez obsługę */
+    /* bez terminu płatności na liście rezerwowej i przy weryfikacji —
+       termin nadaje dopiero przesunięcie z listy / akceptacja obsługi */
     const terminPlatnosci =
-      kwotaNalezna > 0 && !naListeRezerwowa
+      kwotaNalezna > 0 && !naListeRezerwowa && !wymagaAkceptacji
         ? new Date(Date.now() + w.dniNaPlatnosc * 24 * 60 * 60 * 1000)
         : null;
 
@@ -128,7 +131,11 @@ export async function POST(req: Request) {
         nazwisko,
         email,
         telefon,
-        ...(naListeRezerwowa ? { status: "rezerwowa" } : {}),
+        ...(naListeRezerwowa
+          ? { status: "rezerwowa" }
+          : wymagaAkceptacji
+            ? { status: "doAkceptacji" }
+            : {}),
         wydarzenie: Number(wydarzenieId) || wydarzenieId,
         wybraneTerminy: wybrane.map((nazwa) => ({ nazwa })),
         odpowiedzi,
@@ -175,7 +182,12 @@ export async function POST(req: Request) {
          jest w tej chwili wyczerpany. Nie dokonuj jeszcze żadnej wpłaty.
          Jeżeli zwolni się miejsce, otrzymasz e-mail z potwierdzeniem
          i danymi do przelewu.</p>`
-      : kwotaNalezna > 0
+      : wymagaAkceptacji
+        ? `<p><b>Twoje zgłoszenie czeka na weryfikację</b> przez organizatora
+           (np. sprawdzenie załączonych dokumentów). Nie dokonuj jeszcze
+           żadnej wpłaty — po akceptacji otrzymasz e-mail z potwierdzeniem
+           ${kwotaNalezna > 0 ? "i danymi do przelewu" : ""}.</p>`
+        : kwotaNalezna > 0
         ? `<p>Aby potwierdzić udział, prosimy o przelew${terminTekst ? ` do <b>${terminTekst}</b>` : ""}:</p>
            <table cellpadding="6" style="border-collapse:collapse;background:#f7f3e6;border-radius:8px">
              <tr><td>Kwota</td><td><b>${formatujKwote(kwotaNalezna)}</b></td></tr>
@@ -192,7 +204,9 @@ export async function POST(req: Request) {
         to: email,
         subject: naListeRezerwowa
           ? `Lista rezerwowa: ${w.tytul}`
-          : `Zgłoszenie przyjęte: ${w.tytul}`,
+          : wymagaAkceptacji
+            ? `Zgłoszenie przyjęte do weryfikacji: ${w.tytul}`
+            : `Zgłoszenie przyjęte: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
           <p>Dzień dobry ${imie},</p>
           <p>dziękujemy za zgłoszenie na <b>${w.tytul}</b>${
@@ -218,6 +232,7 @@ export async function POST(req: Request) {
       linkProfilu,
       bezplatne: kwotaNalezna === 0,
       rezerwowa: naListeRezerwowa,
+      akceptacja: !naListeRezerwowa && wymagaAkceptacji,
     });
   } catch (e) {
     console.error("Błąd przyjmowania zgłoszenia:", e);

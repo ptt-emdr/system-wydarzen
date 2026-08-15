@@ -51,7 +51,7 @@ export const Zgloszenia: CollectionConfig = {
           0,
         );
         data.wplacono = wplacono;
-        const reczne = ["anulowane", "obecny", "nieobecny", "rezerwowa"];
+        const reczne = ["anulowane", "obecny", "nieobecny", "rezerwowa", "doAkceptacji", "odrzucone"];
         if (!reczne.includes(data.status)) {
           data.status =
             wplacono >= (data.kwotaNalezna || 0) ? "potwierdzone" : "oczekuje";
@@ -177,11 +177,13 @@ export const Zgloszenia: CollectionConfig = {
       defaultValue: "oczekuje",
       label: { pl: "Status", en: "Status" },
       options: [
+        { value: "doAkceptacji", label: { pl: "Do akceptacji (weryfikacja)", en: "Pending approval" } },
         { value: "oczekuje", label: { pl: "Oczekuje na wpłatę", en: "Awaiting payment" } },
         { value: "potwierdzone", label: { pl: "Potwierdzone (opłacone)", en: "Confirmed" } },
         { value: "rezerwowa", label: { pl: "Lista rezerwowa", en: "Waitlist" } },
         { value: "obecny", label: { pl: "Obecny (po wydarzeniu)", en: "Attended" } },
         { value: "nieobecny", label: { pl: "Nieobecny (po wydarzeniu)", en: "No-show" } },
+        { value: "odrzucone", label: { pl: "Odrzucone (weryfikacja)", en: "Rejected" } },
         { value: "anulowane", label: { pl: "Anulowane", en: "Cancelled" } },
       ],
       admin: {
@@ -190,6 +192,25 @@ export const Zgloszenia: CollectionConfig = {
           pl: "Obecny/Nieobecny uzupełnia się po wydarzeniu — certyfikaty można wysłać wyłącznie Obecnym. Zmiana z Listy rezerwowej na „Oczekuje” wysyła e-mail z płatnością i terminem.",
           en: "",
         },
+      },
+    },
+    {
+      /* przyciski Akceptuj / Odrzuć — widoczne przy statusie „Do akceptacji" */
+      name: "akceptacjaUI",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: { Field: "/components/admin/AkceptacjaPrzyciski#AkceptacjaPrzyciski" },
+      },
+    },
+    {
+      name: "powodOdrzucenia",
+      type: "text",
+      label: { pl: "Powód odrzucenia (wysłany uczestnikowi)", en: "Rejection reason" },
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        condition: (data) => data?.status === "odrzucone",
       },
     },
     {

@@ -29,6 +29,8 @@ export type StatystykiWydarzenia = {
   zapisani: number;
   rezerwowa: number;
   anulowani: number;
+  odrzuceni: number;
+  doAkceptacji: number;
   oczekuja: number;
   oplaceni: number;
   obecni: number;
@@ -67,7 +69,8 @@ export async function statystykiWydarzenia(
   const teraz = new Date();
 
   const s: StatystykiWydarzenia = {
-    zapisani: 0, rezerwowa: 0, anulowani: 0, oczekuja: 0, oplaceni: 0,
+    zapisani: 0, rezerwowa: 0, anulowani: 0, odrzuceni: 0, doAkceptacji: 0,
+    oczekuja: 0, oplaceni: 0,
     obecni: 0, nieobecni: 0, przychodOczekiwany: 0, wplatyZaksiegowane: 0,
     zwroty: 0, naleznosci: 0, nadplaty: 0, wartoscRejestracji: 0,
     fakturNaProsbe: 0, nieoplaceni: [], poTerminie: 0, wTerminie: 0,
@@ -83,8 +86,9 @@ export async function statystykiWydarzenia(
     }
     if (z.chceFakture) s.fakturNaProsbe++;
 
-    if (z.status === "anulowane") {
-      s.anulowani++;
+    if (z.status === "anulowane" || z.status === "odrzucone") {
+      if (z.status === "odrzucone") s.odrzuceni++;
+      else s.anulowani++;
       s.wartoscRejestracji += nalezne;
       continue;
     }
@@ -92,8 +96,14 @@ export async function statystykiWydarzenia(
       s.rezerwowa++;
       continue;
     }
-    /* zapisani (oczekuje / potwierdzone / obecny / nieobecny) */
+    /* zapisani (do akceptacji / oczekuje / potwierdzone / obecny / nieobecny) */
     s.zapisani++;
+    if (z.status === "doAkceptacji") {
+      s.doAkceptacji++;
+      s.przychodOczekiwany += nalezne;
+      s.naleznosci += Math.max(nalezne - (z.wplacono || 0), 0);
+      continue; /* bez listy nieopłaconych — płatność dopiero po akceptacji */
+    }
     s.przychodOczekiwany += nalezne;
     const wplacono = z.wplacono || 0;
     s.naleznosci += Math.max(nalezne - wplacono, 0);

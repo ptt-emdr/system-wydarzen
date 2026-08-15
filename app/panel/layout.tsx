@@ -19,7 +19,7 @@ export default function LayoutPanelu({ children }: { children: React.ReactNode }
   return (
     <html lang="pl" className={`${figtree.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-mist/40 font-sans">
-        <div className="bg-navy text-white">
+        <div className="bez-druku bg-navy text-white">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 text-sm">
             <a href="/panel" className="font-bold tracking-wide">
               Karty wydarzeń · panel obsługi PTT EMDR

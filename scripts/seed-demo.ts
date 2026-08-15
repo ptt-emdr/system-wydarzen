@@ -14,6 +14,7 @@ async function seed() {
     slug: "cykl-superwizji-dim-jesien-2026",
     typ: "cykl" as const,
     opublikowane: true,
+    akceptacjaUczestnikow: true,
     dataOd: "2026-10-10T16:00:00.000Z",
     dataDo: "2026-12-12T18:00:00.000Z",
     miejsce: "online (Zoom)",
