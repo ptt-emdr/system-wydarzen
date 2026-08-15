@@ -15,13 +15,30 @@ export function LinkPanelu() {
         border: "1px solid var(--theme-elevation-150, #ddd)",
       }}
     >
-      <span style={{ fontWeight: 600 }}>
-        Podsumowania, finanse i raporty wydarzeń znajdziesz na Kartach wydarzeń:
+      <a
+        href="/admin/collections/wydarzenia/create"
+        style={{
+          padding: "10px 22px",
+          borderRadius: "999px",
+          background: "#fbbb15",
+          color: "#16303c",
+          fontWeight: 800,
+          fontSize: "15px",
+          textDecoration: "none",
+          boxShadow: "0 2px 8px rgba(22,48,60,.2)",
+        }}
+      >
+        ＋ Dodaj wydarzenie
+      </a>
+      <span style={{ fontWeight: 600, marginLeft: "auto" }}>
+        Podsumowania, finanse i raporty:
       </span>
       <a
         href="/panel"
+        target="_blank"
+        rel="noopener"
         style={{
-          padding: "6px 14px",
+          padding: "8px 16px",
           borderRadius: "999px",
           background: "#1d3d76",
           color: "#fff",
@@ -29,7 +46,7 @@ export function LinkPanelu() {
           textDecoration: "none",
         }}
       >
-        Otwórz Karty wydarzeń →
+        Otwórz Karty wydarzeń ↗
       </a>
     </div>
   );

@@ -49,11 +49,28 @@ export default buildConfig({
         }),
       }
     : {}),
-  i18n: { supportedLanguages: { pl, en }, fallbackLanguage: "pl" },
+  i18n: {
+    supportedLanguages: { pl, en },
+    fallbackLanguage: "pl",
+    /* przyjaźniejsze etykiety przycisków tworzenia („Dodaj wydarzenie”) */
+    translations: {
+      pl: {
+        general: {
+          createNew: "Dodaj",
+          createNewLabel: "Dodaj {{label}}",
+          addNew: "Dodaj",
+        },
+      },
+    },
+  },
   admin: {
     user: "users",
     meta: { titleSuffix: " — Wydarzenia PTT EMDR" },
     dateFormat: "dd.MM.yyyy",
+    components: {
+      /* domyślnie jasny motyw (zmiana na ciemny: Konto → Wygląd) */
+      providers: ["/components/admin/DomyslnyMotyw#DomyslnyMotyw"],
+    },
   },
   collections: [Wydarzenia, Zgloszenia, ZalacznikiZgloszen, Users],
   globals: [Ustawienia],
