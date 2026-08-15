@@ -24,7 +24,7 @@ export const Wydarzenia: CollectionConfig = {
   },
   admin: {
     useAsTitle: "tytul",
-    defaultColumns: ["tytul", "dataOd", "opublikowane"],
+    defaultColumns: ["tytul", "dataOd", "liczbaZapisanych", "opublikowane"],
     group: { pl: "Wydarzenia", en: "Events" },
     description: {
       pl: "Wydarzenie pojawia się na stronie zapisów dopiero po zaznaczeniu „Opublikowane”.",
@@ -65,6 +65,36 @@ export const Wydarzenia: CollectionConfig = {
       defaultValue: false,
       label: { pl: "Opublikowane (widoczne i otwarte na zapisy)", en: "Published" },
       admin: { position: "sidebar" },
+    },
+    {
+      /* pole wirtualne: nie jest zapisywane w bazie — liczy się przy
+         każdym odczycie z nieanulowanych zgłoszeń (kolumna na liście) */
+      name: "liczbaZapisanych",
+      type: "number",
+      virtual: true,
+      label: { pl: "Zapisani", en: "Registered" },
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: { pl: "Aktualna liczba zapisanych (bez anulowanych).", en: "" },
+      },
+      hooks: {
+        afterRead: [
+          async ({ data, req }) => {
+            if (!data?.id) return 0;
+            const wynik = await req.payload.count({
+              collection: "zgloszenia",
+              where: {
+                and: [
+                  { wydarzenie: { equals: data.id } },
+                  { status: { not_equals: "anulowane" } },
+                ],
+              },
+            });
+            return wynik.totalDocs;
+          },
+        ],
+      },
     },
     {
       type: "row",

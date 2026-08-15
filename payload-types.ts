@@ -139,6 +139,7 @@ export interface Wydarzenia {
    */
   slug?: string | null;
   opublikowane?: boolean | null;
+  liczbaZapisanych?: number | null;
   dataOd: string;
   dataDo?: string | null;
   miejsce?: string | null;
@@ -372,6 +373,7 @@ export interface WydarzeniaSelect<T extends boolean = true> {
   tytul?: T;
   slug?: T;
   opublikowane?: T;
+  liczbaZapisanych?: T;
   dataOd?: T;
   dataDo?: T;
   miejsce?: T;
