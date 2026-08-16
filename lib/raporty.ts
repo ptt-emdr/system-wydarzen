@@ -96,20 +96,17 @@ export async function statystykiWydarzenia(
       s.rezerwowa++;
       continue;
     }
-    /* zapisani (do akceptacji / oczekuje / potwierdzone / obecny / nieobecny) */
+    /* zapisani (do akceptacji / oczekuje / potwierdzone / obecny / nieobecny);
+       weryfikacja nie wstrzymuje płatności — doAkceptacji liczy się
+       finansowo jak oczekiwanie na wpłatę */
     s.zapisani++;
-    if (z.status === "doAkceptacji") {
-      s.doAkceptacji++;
-      s.przychodOczekiwany += nalezne;
-      s.naleznosci += Math.max(nalezne - (z.wplacono || 0), 0);
-      continue; /* bez listy nieopłaconych — płatność dopiero po akceptacji */
-    }
+    if (z.status === "doAkceptacji") s.doAkceptacji++;
     s.przychodOczekiwany += nalezne;
     const wplacono = z.wplacono || 0;
     s.naleznosci += Math.max(nalezne - wplacono, 0);
     s.nadplaty += Math.max(wplacono - nalezne, 0);
-    if (z.status === "oczekuje") {
-      s.oczekuja++;
+    if (z.status === "oczekuje" || z.status === "doAkceptacji") {
+      if (z.status === "oczekuje") s.oczekuja++;
       const brakuje = Math.max(nalezne - wplacono, 0);
       if (brakuje > 0) {
         const przekroczony = z.terminPlatnosci

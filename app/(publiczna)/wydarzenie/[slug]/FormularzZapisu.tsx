@@ -79,20 +79,9 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
     return (
       <div className="rounded-2xl border border-brand/30 bg-mist p-6 shadow-soft">
         <h2 className="font-display text-2xl font-semibold text-navy">
-          {ok.rezerwowa
-            ? "Jesteś na liście rezerwowej"
-            : ok.akceptacja
-              ? "Zgłoszenie przyjęte do weryfikacji"
-              : "Dziękujemy — zgłoszenie przyjęte!"}
+          {ok.rezerwowa ? "Jesteś na liście rezerwowej" : "Dziękujemy — zgłoszenie przyjęte!"}
         </h2>
-        {ok.akceptacja ? (
-          <p className="mt-3 text-ink/80">
-            Twoje zgłoszenie czeka na <b>weryfikację przez organizatora</b>{" "}
-            (m.in. sprawdzenie załączonych dokumentów).{" "}
-            <b>Nie dokonuj jeszcze wpłaty</b> — po akceptacji otrzymasz e-mail
-            z potwierdzeniem{ok.kwota > 0 ? " i danymi do przelewu" : ""}.
-          </p>
-        ) : ok.rezerwowa ? (
+        {ok.rezerwowa ? (
           <p className="mt-3 text-ink/80">
             Limit miejsc jest wyczerpany, więc Twoje zgłoszenie trafiło na{" "}
             <b>listę rezerwową</b>. <b>Nie dokonuj jeszcze wpłaty.</b> Jeżeli
@@ -137,6 +126,13 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
               Te same informacje wysłaliśmy e-mailem. Brak wpłaty w terminie
               oznacza zwolnienie miejsca.
             </p>
+            {ok.akceptacja ? (
+              <p className="mt-2 text-sm text-ink/70">
+                Zgłoszenia na to wydarzenie podlegają weryfikacji załączonych
+                dokumentów. Jeżeli rejestracja nie zostanie zamknięta
+                pozytywnie, otrzymasz <b>zwrot wpłaconych środków</b>.
+              </p>
+            ) : null}
           </>
         )}
         <a

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     where: {
       and: [
         { wydarzenie: { equals: wydarzenieId } },
-        { status: { equals: "oczekuje" } },
+        { status: { in: ["oczekuje", "doAkceptacji"] } },
       ],
     },
     limit: 2000,

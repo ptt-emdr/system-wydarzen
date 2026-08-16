@@ -46,7 +46,7 @@ export default async function ProfilUczestnika({
   const doZaplaty = Math.max((z.kwotaNalezna || 0) - (z.wplacono || 0), 0);
 
   const statusInfo: Record<string, { tekst: string; klasa: string }> = {
-    doAkceptacji: { tekst: "Czeka na weryfikację — nie dokonuj wpłaty", klasa: "bg-sun/70 text-ink" },
+    doAkceptacji: { tekst: "Przyjęte — w trakcie weryfikacji dokumentów", klasa: "bg-sun/70 text-ink" },
     odrzucone: { tekst: "Zgłoszenie odrzucone po weryfikacji", klasa: "bg-coral/80 text-white" },
     oczekuje: { tekst: "Oczekuje na wpłatę", klasa: "bg-sun text-ink" },
     potwierdzone: { tekst: "Potwierdzone — do zobaczenia!", klasa: "bg-brand text-white" },
@@ -101,7 +101,7 @@ export default async function ProfilUczestnika({
         </div>
       </dl>
 
-      {z.status === "oczekuje" && doZaplaty > 0 ? (
+      {(z.status === "oczekuje" || z.status === "doAkceptacji") && doZaplaty > 0 ? (
         <div className="mt-6 rounded-2xl bg-mist p-6">
           <h2 className="font-display text-xl font-semibold text-navy">Dane do przelewu</h2>
           <dl className="mt-3 space-y-2 text-sm">

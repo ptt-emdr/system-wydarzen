@@ -205,7 +205,7 @@ export const Wydarzenia: CollectionConfig = {
       admin: {
         position: "sidebar",
         description: {
-          pl: "Włączone: nowe zgłoszenie trafia do weryfikacji (np. sprawdzenie załączonego dokumentu). Na karcie zgłoszenia pojawiają się przyciski „Akceptuj” / „Odrzuć”; dopiero akceptacja wysyła uczestnikowi dane do przelewu (termin liczony od akceptacji).",
+          pl: "Włączone: nowe zgłoszenie czeka na weryfikację dokumentów (przyciski „Akceptuj”/„Odrzuć” na karcie zgłoszenia). Płatność NIE jest wstrzymywana — uczestnik od razu dostaje dane do przelewu. Akceptacja jest cicha (kontrola wewnętrzna); odrzucenie wysyła e-mail z powodem i informacją o zwrocie wpłaconych środków.",
           en: "",
         },
       },
