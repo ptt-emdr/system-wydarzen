@@ -51,6 +51,9 @@ na proces; konto po sprzątnięciu ma duży zapas do ~100).
    właściwy numer konta do wpłat za wydarzenia), noindex zostaje.
 3. **[Ty]** Zakładasz konto administratora na
    wydarzenia.emdr.org.pl/admin (+ konta obsługi).
+   Ustalona lista kont (18.08.2026):
+   - Krzysztof Beyger — krzysztof.beyger@gmail.com,
+   - Komisja Promocji — promocja@emdr.org.pl.
 4. **[obaj]** Test end-to-end NA PRODUKCJI: testowe wydarzenie
    (nieopublikowane → opublikowane), zapis z załącznikiem, e-maile
    przychodzą z powiadomienia@ (prawdziwy SMTP!), wpłata → status,
