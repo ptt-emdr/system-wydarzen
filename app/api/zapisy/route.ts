@@ -77,7 +77,7 @@ export async function POST(req: Request) {
 
     /* ---- odpowiedzi i załączniki wg kreatora pól ---- */
     const odpowiedzi: { pytanie: string; odpowiedz: string }[] = [];
-    const zalacznikiIds: (number | string)[] = [];
+    const zalacznikiIds: number[] = [];
     for (let i = 0; i < (w.pola || []).length; i++) {
       const p = (w.pola || [])[i];
       if (p.typ === "info") continue;
@@ -131,12 +131,12 @@ export async function POST(req: Request) {
         nazwisko,
         email,
         telefon,
-        ...(naListeRezerwowa
-          ? { status: "rezerwowa" }
+        status: naListeRezerwowa
+          ? ("rezerwowa" as const)
           : wymagaAkceptacji
-            ? { status: "doAkceptacji" }
-            : {}),
-        wydarzenie: Number(wydarzenieId) || wydarzenieId,
+            ? ("doAkceptacji" as const)
+            : ("oczekuje" as const),
+        wydarzenie: Number(wydarzenieId),
         wybraneTerminy: wybrane.map((nazwa) => ({ nazwa })),
         odpowiedzi,
         zalaczniki: zalacznikiIds,

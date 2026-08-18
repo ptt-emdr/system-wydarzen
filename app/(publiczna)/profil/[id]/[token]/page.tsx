@@ -32,7 +32,7 @@ export default async function ProfilUczestnika({
       id,
       depth: 1,
       overrideAccess: true,
-    })) as typeof z;
+    })) as unknown as typeof z;
   } catch {
     notFound();
   }

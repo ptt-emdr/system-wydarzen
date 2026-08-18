@@ -114,7 +114,6 @@ export function AkceptacjaPrzyciski() {
           <button
             type="button"
             style={{ ...przycisk, background: "#c22", color: "#fff" }}
-            disabled={tryb === "wysylka"}
             onClick={() => decyzja("odrzuc")}
           >
             Odrzuć i wyślij powód

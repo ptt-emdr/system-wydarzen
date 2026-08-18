@@ -7,6 +7,14 @@ import config from "../payload.config";
  * + proste bezpłatne spotkanie. Idempotentny (po slugu).
  */
 async function seed() {
+  /* BEZPIECZNIK: dane przykładowe (fikcyjny cykl, testowi uczestnicy)
+     są wyłącznie do pracy lokalnej — nigdy na serwer produkcyjny */
+  if (process.env.NODE_ENV === "production") {
+    console.error(
+      "STOP: seed demo nie działa na produkcji (NODE_ENV=production).",
+    );
+    process.exit(1);
+  }
   const payload = await getPayload({ config });
 
   const cykl = {

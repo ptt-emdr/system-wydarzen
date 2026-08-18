@@ -41,7 +41,7 @@ export async function GET(req: Request) {
   };
 
   const dane = docs.map((z) => {
-    const d = z as Record<string, unknown> & {
+    const d = z as unknown as Record<string, unknown> & {
       wydarzenie?: { tytul?: string };
       wybraneTerminy?: { nazwa: string }[];
       odpowiedzi?: { pytanie: string; odpowiedz: string }[];
