@@ -114,3 +114,12 @@ export function formatujKwote(zl: number): string {
 export function bezPogrubien(tekst: string): string {
   return tekst.replace(/\*\*/g, "");
 }
+
+/** Wartości z formularza wstawiane do HTML e-maili muszą być
+ *  zneutralizowane — inaczej zgłoszenie mogłoby wstrzyknąć znaczniki. */
+export function eskapujHtml(s: string): string {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}

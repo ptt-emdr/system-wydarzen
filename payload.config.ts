@@ -16,6 +16,20 @@ import { Ustawienia } from "./globals/Ustawienia";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/* Sekret podpisuje sesje panelu — start produkcji bez niego (czyli z jawnym
+   sekretem zastępczym) pozwalałby sfałszować konto administratora.
+   Wyjątek: sam build (NEXT_PHASE) — pakiet buduje się lokalnie bez
+   sekretów, a kontrola i tak zadziała przy starcie na serwerze. */
+if (
+  process.env.NODE_ENV === "production" &&
+  process.env.NEXT_PHASE !== "phase-production-build" &&
+  !process.env.PAYLOAD_SECRET
+) {
+  throw new Error(
+    "Brak PAYLOAD_SECRET w środowisku produkcyjnym — odmowa startu.",
+  );
+}
+
 /**
  * System zapisów na wydarzenia PTT EMDR (wydarzenia.emdr.org.pl) —
  * OSOBNA aplikacja z własnym panelem i bazą, niezależna od CMS strony

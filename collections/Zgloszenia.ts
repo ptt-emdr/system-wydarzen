@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import crypto from "crypto";
 import { tylkoAdmin } from "./wspolne";
+import { eskapujHtml } from "../lib/wydarzenia";
 
 /**
  * Zgłoszenia uczestników. Powstają WYŁĄCZNIE przez endpoint /api/zapisy
@@ -111,7 +112,7 @@ export const Zgloszenia: CollectionConfig = {
             to: doc.email,
             subject: `Zwolniło się miejsce: ${w.tytul}`,
             html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
-              <p>Dzień dobry ${doc.imie},</p>
+              <p>Dzień dobry ${eskapujHtml(doc.imie)},</p>
               <p>dobra wiadomość — zwolniło się miejsce na <b>${w.tytul}</b>
               i Twoje zgłoszenie zostało przeniesione z listy rezerwowej na listę główną.</p>
               <p>Aby potwierdzić udział, prosimy o przelew${termin ? ` do <b>${termin}</b>` : ""}:</p>

@@ -5,8 +5,22 @@ import {
   aktualnaCena,
   zajetosc,
   formatujKwote,
+  eskapujHtml,
   type WydarzenieDoc,
 } from "@/lib/wydarzenia";
+
+/* proste ograniczenie częstotliwości (jak w formularzach strony głównej):
+   maks. 5 zgłoszeń na godzinę z jednego adresu IP — chroni skrzynkę SMTP
+   i bazę przed zautomatyzowanym spamem; jeden proces Node = mapa wystarcza */
+const zgloszeniaZIp = new Map<string, number[]>();
+function zaCzesto(ip: string): boolean {
+  const teraz = Date.now();
+  const okno = (zgloszeniaZIp.get(ip) ?? []).filter((t) => teraz - t < 3_600_000);
+  if (okno.length >= 5) return true;
+  okno.push(teraz);
+  zgloszeniaZIp.set(ip, okno);
+  return false;
+}
 
 /**
  * Przyjęcie zgłoszenia z formularza (multipart). Cała logika po stronie
@@ -19,6 +33,19 @@ export async function POST(req: Request) {
     const dane = await req.formData();
     const payload = await getPayload({ config });
 
+    /* pole-pułapka na boty: prawdziwy formularz zostawia je puste */
+    if (String(dane.get("www") || "").trim()) {
+      return Response.json({ ok: true });
+    }
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "nieznane";
+    if (zaCzesto(ip)) {
+      return Response.json(
+        { blad: "Zbyt wiele zgłoszeń — spróbuj ponownie później." },
+        { status: 429 },
+      );
+    }
+
     const wydarzenieId = String(dane.get("wydarzenieId") || "");
     const imie = String(dane.get("imie") || "").trim();
     const nazwisko = String(dane.get("nazwisko") || "").trim();
@@ -27,6 +54,12 @@ export async function POST(req: Request) {
     const zgodaRodo = dane.get("zgodaRodo") === "tak";
     if (!wydarzenieId || !imie || !nazwisko || !email || !zgodaRodo) {
       return Response.json({ blad: "Uzupełnij wymagane pola." }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return Response.json(
+        { blad: "Podany adres e-mail wygląda na nieprawidłowy." },
+        { status: 400 },
+      );
     }
 
     const w = (await payload.findByID({
@@ -209,7 +242,7 @@ export async function POST(req: Request) {
           ? `Lista rezerwowa: ${w.tytul}`
           : `Zgłoszenie przyjęte: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
-          <p>Dzień dobry ${imie},</p>
+          <p>Dzień dobry ${eskapujHtml(imie)},</p>
           <p>dziękujemy za zgłoszenie na <b>${w.tytul}</b>${
             wybrane.length ? ` (terminy: ${wybrane.join(", ")})` : ""
           }.</p>

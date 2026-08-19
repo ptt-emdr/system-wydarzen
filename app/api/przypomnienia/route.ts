@@ -1,6 +1,6 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { formatujKwote } from "@/lib/wydarzenia";
+import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
 
 /**
  * Wysyłka przypomnień o płatności do wszystkich nieopłaconych zgłoszeń
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         to: z.email,
         subject: `Przypomnienie o płatności: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
-          <p>Dzień dobry ${z.imie},</p>
+          <p>Dzień dobry ${eskapujHtml(z.imie)},</p>
           <p>przypominamy o płatności za udział w <b>${w.tytul}</b>${termin ? ` — termin płatności: <b>${termin}</b>` : ""}.</p>
           <table cellpadding="6" style="border-collapse:collapse;background:#f7f3e6;border-radius:8px">
             <tr><td>Do zapłaty</td><td><b>${formatujKwote(brakuje)}</b></td></tr>

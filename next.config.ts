@@ -26,6 +26,36 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: process.env.SKIP_TYPECHECK === "1",
   },
+  /* strona nie może zdradzać, na czym stoi */
+  poweredByHeader: false,
+  /* nagłówki bezpieczeństwa (audyt 19.08.2026) — HSTS bez preload,
+     CSP na razie wyłącznie raportująco (panel Payload używa inline
+     skryptów/stylów; zaostrzenie po okresie obserwacji) */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains",
+          },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withPayload(nextConfig);

@@ -154,6 +154,17 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
         {trybRezerwowy ? "Zapisz się na listę rezerwową" : "Zapisz się"}
       </h2>
 
+      {/* pole-pułapka na boty — niewidoczne dla ludzi, boty je wypełniają;
+          serwer po cichu odrzuca zgłoszenia z wypełnionym polem */}
+      <input
+        type="text"
+        name="www"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+
       {trybRezerwowy ? (
         <p className="rounded-xl border border-sun bg-sun/15 p-3 text-sm font-semibold text-ink">
           Miejsca na to wydarzenie są niedostępne — limit został wyczerpany.

@@ -1,6 +1,6 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { formatujKwote } from "@/lib/wydarzenia";
+import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
 
 /**
  * Decyzja o zgłoszeniu w trybie „Akceptowanie uczestników".
@@ -68,10 +68,10 @@ export async function POST(req: Request) {
         to: z.email,
         subject: `Zgłoszenie odrzucone: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
-          <p>Dzień dobry ${z.imie},</p>
+          <p>Dzień dobry ${eskapujHtml(z.imie)},</p>
           <p>niestety Twoje zgłoszenie na <b>${w.tytul}</b> zostało odrzucone
           na etapie weryfikacji.</p>
-          <p><b>Powód:</b> ${komentarz!.trim()}</p>
+          <p><b>Powód:</b> ${eskapujHtml(komentarz!.trim())}</p>
           <p>Jeżeli chcesz to wyjaśnić lub uzupełnić dokumenty — napisz na
           adres <a href="mailto:${u.emailKontaktowy || "sekretarz@emdr.org.pl"}">${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</a>.</p>
           <p>Jeżeli rejestracja nie zostanie zamknięta pozytywnie,

@@ -28,7 +28,14 @@ export async function GET(req: Request) {
     "Status", "Należność", "Wpłacono", "Termin płatności", "Kod przelewu",
     "Faktura", "NIP", "Odpowiedzi",
   ];
-  const pole = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  /* CSV: wartości z formularza zaczynające się od = + - @ Excel wykonałby
+     jako formuły (CSV injection) — neutralizujemy apostrofem. XLSX poniżej
+     jest bezpieczny z natury (exceljs zapisuje ciągi jako tekst). */
+  const bezFormul = (v: unknown) => {
+    const s = String(v ?? "");
+    return /^[=+\-@]/.test(s) ? `'${s}` : s;
+  };
+  const pole = (v: unknown) => `"${bezFormul(v).replace(/"/g, '""')}"`;
   const statusy: Record<string, string> = {
     doAkceptacji: "do akceptacji",
     oczekuje: "oczekuje na wpłatę",
