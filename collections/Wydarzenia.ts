@@ -153,7 +153,12 @@ export const Wydarzenia: CollectionConfig = {
       type: "textarea",
       required: true,
       label: { pl: "Opis wydarzenia", en: "Description" },
-      admin: { description: { pl: "Kilka akapitów na stronie wydarzenia (pusta linia = nowy akapit).", en: "" } },
+      admin: {
+        description: {
+          pl: "Kilka akapitów na stronie wydarzenia. Pusta linia = nowy akapit; **tekst w podwójnych gwiazdkach** = pogrubienie.",
+          en: "Blank line = paragraph; **double asterisks** = bold.",
+        },
+      },
     },
     /* ---------- pieniądze ---------- */
     {

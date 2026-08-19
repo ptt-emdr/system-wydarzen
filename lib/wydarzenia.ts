@@ -109,3 +109,8 @@ export function formatujDate(d: string | Date, zGodzina = true): string {
 export function formatujKwote(zl: number): string {
   return zl.toLocaleString("pl-PL", { minimumFractionDigits: 2 }) + " zł";
 }
+
+/** Zwykły tekst bez znaczników pogrubienia (do zajawek na kaflach). */
+export function bezPogrubien(tekst: string): string {
+  return tekst.replace(/\*\*/g, "");
+}

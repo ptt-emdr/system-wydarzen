@@ -3,6 +3,7 @@ import config from "@payload-config";
 import Link from "next/link";
 import {
   aktualnaCena,
+  bezPogrubien,
   formatujDate,
   formatujKwote,
   type WydarzenieDoc,
@@ -64,7 +65,7 @@ export default async function ListaWydarzen() {
                   <h2 className="mt-2 font-display text-2xl font-semibold text-navy group-hover:text-brand-deep">
                     {w.tytul}
                   </h2>
-                  <p className="mt-3 line-clamp-3 text-ink/75">{w.opis}</p>
+                  <p className="mt-3 line-clamp-3 text-ink/75">{bezPogrubien(w.opis)}</p>
                   <div className="mt-5 flex items-center justify-between">
                     <span className="rounded-full bg-cream px-4 py-1.5 text-sm font-bold text-navy">
                       {w.cena === 0 && !prog

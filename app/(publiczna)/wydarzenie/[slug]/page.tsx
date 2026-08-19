@@ -93,8 +93,19 @@ export default async function StronaWydarzenia({
 
       <section className="mx-auto grid max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[1fr_420px]">
         <article className="space-y-4 text-lg leading-relaxed text-ink/85">
+          {/* akapity po pustej linii; **tekst** = pogrubienie */}
           {w.opis.split(/\n\s*\n/).map((akapit, i) => (
-            <p key={i}>{akapit}</p>
+            <p key={i}>
+              {akapit.split(/\*\*(.+?)\*\*/g).map((czesc, j) =>
+                j % 2 === 1 ? (
+                  <strong key={j} className="font-bold text-ink">
+                    {czesc}
+                  </strong>
+                ) : (
+                  czesc
+                ),
+              )}
+            </p>
           ))}
           {w.trybZapisu === "terminy" && terminyInfo.length > 0 ? (
             <div className="mt-6 rounded-2xl bg-mist p-6">
