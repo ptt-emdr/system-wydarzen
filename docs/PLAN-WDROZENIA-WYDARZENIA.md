@@ -1,6 +1,10 @@
 # Plan wdrożenia wydarzenia.emdr.org.pl i współpracy ze stroną główną
 
-Wersja 1.0 · 18.08.2026 · role: **[Ty]** — Krzysztof (panele, DNS,
+Wersja 1.1 · 19.08.2026 · STATUS: Etapy 0–2 WYKONANE 19.08.2026
+(aplikacja działa na https://wydarzenia.emdr.org.pl — certyfikat Certum do
+6.03.2027, baza zmigrowana, rachunek ING i odbiorca ustawieni, test
+end-to-end z prawdziwym e-mailem potwierdzony, dane testowe usunięte;
+do zamknięcia Etapu 2: konta administratorów — Krzysztof + promocja@). · role: **[Ty]** — Krzysztof (panele, DNS,
 decyzje) · **[K]** — blok techniczny Claude · **[Zarząd]** — decyzje.
 
 Kontekst: cykl DiM ma być ogłoszony **na początku września** — plan jest
