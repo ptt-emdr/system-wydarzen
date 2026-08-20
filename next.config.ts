@@ -38,7 +38,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains",
+            value: "max-age=63072000",
           },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
