@@ -1,6 +1,7 @@
 # Dokumentacja techniczna — System zapisów na wydarzenia PTT EMDR
 
-Wersja 1.0 · 18.08.2026 · dotyczy aplikacji `wydarzenia-app`
+Wersja 1.1 · 20.08.2026 · dotyczy aplikacji `wydarzenia-app`
+(zmiany od 1.0: system NA PRODUKCJI — aneks w rozdz. 15)
 (docelowo **https://wydarzenia.emdr.org.pl**).
 Autor wdrożenia: Claude (Anthropic) we współpracy z Krzysztofem Beygerem.
 Dokument uzupełnia „Dokumentację techniczną strony PTT EMDR" — wspólne
@@ -218,7 +219,7 @@ i Ustawienia; zgłoszenia, załączniki i konta — wyłącznie po zalogowaniu.
 | Środowisko | Uruchomienie | Baza / pliki |
 |---|---|---|
 | Lokalne | `npm run dev` (port **3100**); pierwszy start tworzy schemat (dev push) | `wydarzenia-dev.db`, `uploads/` w projekcie |
-| Produkcja (plan) | standalone build + Passenger, subdomena wydarzenia.emdr.org.pl | `~/data/wydarzenia/{wydarzenia.db, uploads/}` |
+| Produkcja (**działa od 19.08.2026**) | standalone build + Passenger (CloudLinux, druga aplikacja Node na koncie), https://wydarzenia.emdr.org.pl | `~/data/wydarzenia/{wydarzenia.db, uploads/}` — poza katalogiem aplikacji |
 
 Seed danych przykładowych: `npx payload run scripts/seed-demo.ts`
 (cykl DiM z akceptacją i wymaganym certyfikatem + bezpłatne spotkanie
@@ -246,3 +247,65 @@ główna). Po zmianach komponentów panelu: `npx payload generate:importmap`.
 4. Referaty i recenzje — F4. Zapisane filtry list — z modułem raportów.
 5. PDF Karty przez okno drukowania (nie bezpośredni download);
    licznik rezerwacji miejsca w trakcie wypełniania — do rozważenia.
+
+---
+
+## 15. Aneks produkcyjny (20.08.2026)
+
+### 15.1. Infrastruktura produkcyjna (wdrożona 19.08.2026)
+
+- **Adres:** https://wydarzenia.emdr.org.pl — jawny rekord A w strefie
+  kei → 185.208.164.72 (cyber_Folks s72, konto utfpuzbqpi). HTTP→HTTPS
+  wymuszone; certyfikat SSL hostingu ważny do 6.03.2027 (auto-instalacja).
+- **Druga aplikacja Node** obok strony głównej: utworzona przez
+  `cloudlinux-selector create … --app-root apps/wydarzenia
+  --startup-file server.js`; zmienne środowiskowe ustawiane KOMPLETEM
+  przez `cloudlinux-selector set --env-vars` (**nadpisuje cały
+  zestaw!**) — lądują w `.htaccess` jako `SetEnv`. Osobny
+  `PAYLOAD_SECRET` (inny niż strona), `PUBLIC_URL`, limity wątków jak
+  strona główna.
+- **Baza:** zmigrowana klasycznie (`migrations/20260819_100452_init`,
+  bez dev-push na produkcji). Dane i uploady w `~/data/wydarzenia/`
+  — przeżywają każde wdrożenie (`rsync --delete` nie sięga poza
+  katalog aplikacji).
+- **Ustawienia produkcyjne (global „Ustawienia” w panelu):** rachunek
+  ING 86 1050 1012 1000 0090 8043 4351, odbiorca: Polskie Towarzystwo
+  Terapii EMDR, Al. Jana Pawła II 27, 00-867 Warszawa; e-maile przez
+  powiadomienia@ (SMTP kei) — test end-to-end z prawdziwym adresem
+  potwierdzony 19.08.
+- **Procedura wdrożenia i jej pułapki** — wspólna ze stroną główną:
+  `DOKUMENTACJA-TECHNICZNA.md` strony, rozdz. 13 + aneks 45.3
+  (mkdir tmp, ~40–60 s Passengera, sprzątanie instancji po
+  `readlink /proc/PID/cwd`, spawn EAGAIN, migawka ISR).
+
+### 15.2. Hartowanie po audycie bezpieczeństwa (19.08.2026)
+
+Pełny raport: `AUDYT-BEZPIECZENSTWA-2026-08-19.md` (katalog projektu
+strony). Wdrożone (commit `b71dd58`):
+
+| Obszar | Wdrożenie |
+|---|---|
+| Nagłówki HTTP | HSTS (bez `includeSubDomains` — od 20.08), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, `poweredByHeader: false`, CSP Report-Only |
+| Sekret | fail-fast: produkcja bez `PAYLOAD_SECRET` odmawia startu |
+| Rate-limit zapisów | max 5 zgłoszeń/h z jednego IP na `/api/zapisy` (mapa w pamięci procesu) |
+| Anti-bot | pole-pułapka `www` w formularzu (bot je wypełnia → cicha akceptacja bez zapisu); walidacja formatu e-mail |
+| E-maile | `eskapujHtml()` na wartościach z formularza wstawianych do HTML wiadomości |
+| Eksport CSV | neutralizacja formuł (`= + - @` → apostrof) — ochrona przed CSV injection; XLSX bezpieczny z natury (exceljs zapisuje tekst) |
+| Zależności | `undici` 7.29; świadomie odłożone: bump `sharp`/`next` (breaking) |
+
+### 15.3. Zmiany funkcjonalne po 1.0
+
+- **Pogrubienia w opisie wydarzenia** przez `**tekst**` (19.08) —
+  render przez elementy React (bez HTML injection); kafle listy
+  pokazują zajawkę bez znaczników (`bezPogrubien`).
+- Na produkcji stoją dwa wydarzenia „Testowe — …” do prezentacji
+  narzędzia (zapisy na nie działają naprawdę) — do usunięcia po
+  prezentacji.
+- Konta panelu: Krzysztof (założone); promocja@emdr.org.pl — do
+  założenia.
+
+### 15.4. Otwarte pozycje audytu
+
+Backup automatyczny z próbnym restore, monitoring uptime, role
+kont/MFA, audit-log operacji — wspólne z planem strony głównej
+(HANDOFF.md w repo strony).

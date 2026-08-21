@@ -1,7 +1,6 @@
 # Instrukcja obsługi panelu — System zapisów na wydarzenia PTT EMDR
 
-**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej**
-wersja 1.0 · 18.08.2026 · dotyczy wydarzenia.emdr.org.pl
+**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej** · wersja 1.1 · 20.08.2026
 (w czasie testów: http://localhost:3100)
 
 ---
@@ -171,3 +170,23 @@ Wejście: przycisk **„Otwórz Karty wydarzeń"** nad listą Wydarzeń
   na karcie i uzupełnij dane.
 - **Coś nie działa?** Napisz do administratora technicznego; awaryjne
   procedury opisuje dokumentacja techniczna.
+
+## 10. Pogrubianie tekstu w opisie wydarzenia (od 19.08.2026)
+
+Pole „Opis” to zwykły tekst, ale można w nim pogrubiać fragmenty:
+otocz tekst **podwójnymi gwiazdkami**, np.:
+
+```
+Zapraszamy na **superwizję dla terapeutów Dzieci i Młodzieży**.
+Warunkiem udziału jest **certyfikat Practitionera**.
+```
+
+Na stronie wydarzenia taki fragment wyświetli się pogrubiony.
+Dwie zasady:
+
+- gwiazdki działają tylko na stronie wydarzenia — na kaflach listy
+  (zajawki) tekst pokazuje się bez gwiazdek i bez pogrubienia,
+- akapity oddzielasz pustą linią (Enter, Enter) — tak jak dotychczas.
+
+Innego formatowania (kursywa, listy, linki) w opisie nie ma — to
+świadoma decyzja, żeby panel pozostał prosty.
