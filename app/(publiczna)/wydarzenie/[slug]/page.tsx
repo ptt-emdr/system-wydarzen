@@ -45,14 +45,22 @@ export default async function StronaWydarzenia({
     return { nazwa: t.nazwa, data: t.data, cena: t.cenaTerminu ?? cena, wolne, zamkniete };
   });
   const wolneWydarzenia = w.limitMiejsc ? Math.max(w.limitMiejsc - lacznie, 0) : null;
+  /* twarde zamknięcie zapisów po terminie (np. koniec rekrutacji) —
+     zamyka też listę rezerwową */
+  const poTerminie =
+    w.trybZapisu === "wydarzenie" && w.zapisyDo
+      ? teraz > new Date(w.zapisyDo)
+      : false;
   /* limit wyczerpany: dla pojedynczego wydarzenia — limit ogólny;
      dla cyklu — wszystkie terminy pełne lub po dacie zamknięcia */
   const brakMiejsc =
-    w.trybZapisu === "wydarzenie"
+    poTerminie ||
+    (w.trybZapisu === "wydarzenie"
       ? wolneWydarzenia === 0
-      : terminyInfo.length > 0 && terminyInfo.every((t) => t.zamkniete);
+      : terminyInfo.length > 0 && terminyInfo.every((t) => t.zamkniete));
   /* opcja per wydarzenie: pełny limit → zapisy na listę rezerwową */
   const trybRezerwowy =
+    !poTerminie &&
     brakMiejsc &&
     w.trybZapisu === "wydarzenie" &&
     Boolean((w as { listaRezerwowa?: boolean }).listaRezerwowa);
@@ -75,10 +83,17 @@ export default async function StronaWydarzenia({
               </span>
             ) : null}
             <span className="rounded-full bg-navy px-4 py-1.5 text-white shadow-soft">
-              {w.cena === 0 && !w.progiCenowe?.length
-                ? "Udział bezpłatny"
-                : `${formatujKwote(cena)}${prog ? ` — ${prog}` : ""}${w.trybZapisu === "terminy" ? " za termin" : ""}`}
+              {w.etykietaKosztow
+                ? w.etykietaKosztow
+                : w.cena === 0 && !w.progiCenowe?.length
+                  ? "Udział bezpłatny"
+                  : `${formatujKwote(cena)}${prog ? ` — ${prog}` : ""}${w.trybZapisu === "terminy" ? " za termin" : ""}`}
             </span>
+            {w.zapisyDo && !poTerminie ? (
+              <span className="rounded-full bg-white px-4 py-1.5 text-ink/80 shadow-soft">
+                Zgłoszenia do: {formatujDate(w.zapisyDo)}
+              </span>
+            ) : null}
             {wolneWydarzenia !== null ? (
               <span className="rounded-full bg-sun px-4 py-1.5 text-ink shadow-soft">
                 Wolne miejsca: {wolneWydarzenia}
@@ -95,7 +110,7 @@ export default async function StronaWydarzenia({
         <article className="space-y-4 text-lg leading-relaxed text-ink/85">
           {/* akapity po pustej linii; **tekst** = pogrubienie */}
           {w.opis.split(/\n\s*\n/).map((akapit, i) => (
-            <p key={i}>
+            <p key={i} className="whitespace-pre-line">
               {akapit.split(/\*\*(.+?)\*\*/g).map((czesc, j) =>
                 j % 2 === 1 ? (
                   <strong key={j} className="font-bold text-ink">
@@ -140,7 +155,9 @@ export default async function StronaWydarzenia({
                 Zapisy niedostępne
               </p>
               <p className="mt-2 font-semibold text-ink/70">
-                Limit dostępnych miejsc został wyczerpany.
+                {poTerminie
+                  ? `Zgłoszenia przyjmowaliśmy do ${formatujDate(w.zapisyDo!)}.`
+                  : "Limit dostępnych miejsc został wyczerpany."}
               </p>
               <p className="mt-2 text-sm text-ink/60">
                 Napisz do organizatora — w razie zwolnienia miejsca damy znać.

@@ -144,6 +144,9 @@ export interface Wydarzenia {
   dataOd: string;
   dataDo?: string | null;
   miejsce?: string | null;
+  /**
+   * Blank line = paragraph; **double asterisks** = bold.
+   */
   opis: string;
   /**
    * 0 = free.
@@ -151,6 +154,8 @@ export interface Wydarzenia {
   cena: number;
   dniNaPlatnosc: number;
   limitMiejsc?: number | null;
+  zapisyDo?: string | null;
+  etykietaKosztow?: string | null;
   akceptacjaUczestnikow?: boolean | null;
   listaRezerwowa?: boolean | null;
   /**
@@ -178,7 +183,7 @@ export interface Wydarzenia {
   pola?:
     | {
         etykieta: string;
-        typ: 'tekst' | 'tekstDlugi' | 'lista' | 'opcje' | 'checkbox' | 'zalacznik' | 'info';
+        typ: 'tekst' | 'tekstDlugi' | 'lista' | 'opcje' | 'wybor' | 'checkbox' | 'zalacznik' | 'info';
         wymagane?: boolean | null;
         opcje?: string | null;
         id?: string | null;
@@ -388,6 +393,8 @@ export interface WydarzeniaSelect<T extends boolean = true> {
   cena?: T;
   dniNaPlatnosc?: T;
   limitMiejsc?: T;
+  zapisyDo?: T;
+  etykietaKosztow?: T;
   akceptacjaUczestnikow?: T;
   listaRezerwowa?: T;
   progiCenowe?:

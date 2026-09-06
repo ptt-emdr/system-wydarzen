@@ -203,6 +203,36 @@ export const Wydarzenia: CollectionConfig = {
       ],
     },
     {
+      type: "row",
+      fields: [
+        {
+          name: "zapisyDo",
+          type: "date",
+          label: { pl: "Zapisy do (tryb „całe wydarzenie”)", en: "Registration deadline" },
+          admin: {
+            width: "50%",
+            date: { pickerAppearance: "dayAndTime", displayFormat: "dd.MM.yyyy HH:mm" },
+            description: {
+              pl: "Po tym terminie formularz zamyka się sam (np. koniec rekrutacji). Puste = zapisy do wyczerpania miejsc. Cykl: terminy mają własne pola „Zapisy do”.",
+              en: "",
+            },
+          },
+        },
+        {
+          name: "etykietaKosztow",
+          type: "text",
+          label: { pl: "Etykieta kosztów (zamiast ceny)", en: "Cost label" },
+          admin: {
+            width: "50%",
+            description: {
+              pl: "Np. „250 zł za spotkanie — płatne w trakcie programu”. Wyświetlana na kaflu i stronie zamiast ceny; zapis pozostaje bez płatności (przy cenie 0 e-mail nie obiecuje wtedy „miejsca potwierdzonego”, tylko informuje o weryfikacji).",
+              en: "",
+            },
+          },
+        },
+      ],
+    },
+    {
       name: "akceptacjaUczestnikow",
       type: "checkbox",
       defaultValue: false,
@@ -340,6 +370,7 @@ export const Wydarzenia: CollectionConfig = {
                 { value: "tekstDlugi", label: { pl: "Tekst (wiele linii)", en: "Textarea" } },
                 { value: "lista", label: { pl: "Lista rozwijana", en: "Select" } },
                 { value: "opcje", label: { pl: "Jeden z wielu (kółka)", en: "Radio" } },
+                { value: "wybor", label: { pl: "Wiele z wielu (checkboxy)", en: "Multi-select" } },
                 { value: "checkbox", label: { pl: "Pole wyboru (tak/nie)", en: "Checkbox" } },
                 { value: "zalacznik", label: { pl: "Załącznik (PDF/JPG/PNG)", en: "File" } },
                 { value: "info", label: { pl: "Blok informacyjny (bez odpowiedzi)", en: "Info" } },

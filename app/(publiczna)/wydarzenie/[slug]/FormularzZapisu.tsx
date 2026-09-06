@@ -2,6 +2,27 @@
 
 import { useMemo, useState } from "react";
 
+/** Zamienia adresy www w tekście etykiety/bloku info na klikalne odnośniki. */
+function zLinkami(tekst: string): React.ReactNode[] {
+  return tekst
+    .split(/(https?:\/\/[^\s)]+|wydarzenia\.emdr\.org\.pl[^\s)]*)/g)
+    .map((czesc, i) =>
+      /^(https?:\/\/|wydarzenia\.emdr\.org\.pl)/.test(czesc) ? (
+        <a
+          key={i}
+          href={czesc.startsWith("http") ? czesc : `https://${czesc}`}
+          target="_blank"
+          rel="noreferrer"
+          className="font-semibold text-brand-deep underline underline-offset-2"
+        >
+          {czesc}
+        </a>
+      ) : (
+        czesc
+      ),
+    );
+}
+
 /* Formularz zapisu — buduje się z definicji pól wydarzenia (kreator
    w panelu). Wysyła multipart POST na /api/zapisy; po sukcesie pokazuje
    instrukcję płatności zwróconą przez serwer. */
@@ -87,6 +108,12 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
             <b>listę rezerwową</b>. <b>Nie dokonuj jeszcze wpłaty.</b> Jeżeli
             zwolni się miejsce, otrzymasz e-mail z potwierdzeniem i danymi do
             przelewu.
+          </p>
+        ) : ok.bezplatne && ok.akceptacja ? (
+          <p className="mt-3 text-ink/80">
+            Zgłoszenie trafiło do weryfikacji — o jej wyniku poinformujemy
+            e-mailem. Potwierdzenie przyjęcia zgłoszenia wysłaliśmy na podany
+            adres.
           </p>
         ) : ok.bezplatne ? (
           <p className="mt-3 text-ink/80">
@@ -232,12 +259,12 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
       {wydarzenie.pola.map((p, i) =>
         p.typ === "info" ? (
           <p key={i} className="rounded-xl bg-cream p-3 text-sm text-ink/80">
-            {p.opcje}
+            {zLinkami(p.opcje || "")}
           </p>
         ) : (
           <label key={i} className="block text-sm">
             <span className="font-bold">
-              {p.etykieta} {p.wymagane ? <span className="text-coral">*</span> : null}
+              {zLinkami(p.etykieta)} {p.wymagane ? <span className="text-coral">*</span> : null}
             </span>
             {p.typ === "tekst" ? (
               <input name={`pole-${i}`} required={p.wymagane} className="mt-1 w-full rounded-lg border border-ink/20 px-3 py-2 outline-none transition focus:border-brand" />
@@ -255,6 +282,15 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
                 {(p.opcje || "").split("\n").filter(Boolean).map((o) => (
                   <label key={o} className="flex items-center gap-2 font-normal">
                     <input type="radio" name={`pole-${i}`} value={o.trim()} required={p.wymagane} className="h-4 w-4 accent-brand-deep" />
+                    {o.trim()}
+                  </label>
+                ))}
+              </span>
+            ) : p.typ === "wybor" ? (
+              <span className="mt-1 block space-y-1">
+                {(p.opcje || "").split("\n").filter(Boolean).map((o) => (
+                  <label key={o} className="flex items-center gap-2 font-normal">
+                    <input type="checkbox" name={`pole-${i}`} value={o.trim()} className="h-4 w-4 accent-brand-deep" />
                     {o.trim()}
                   </label>
                 ))}

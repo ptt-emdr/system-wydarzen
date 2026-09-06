@@ -68,9 +68,11 @@ export default async function ListaWydarzen() {
                   <p className="mt-3 line-clamp-3 text-ink/75">{bezPogrubien(w.opis)}</p>
                   <div className="mt-5 flex items-center justify-between">
                     <span className="rounded-full bg-cream px-4 py-1.5 text-sm font-bold text-navy">
-                      {w.cena === 0 && !prog
-                        ? "Bezpłatne"
-                        : `${formatujKwote(cena)}${prog ? ` · ${prog}` : ""}${w.trybZapisu === "terminy" ? " / termin" : ""}`}
+                      {w.etykietaKosztow
+                        ? w.etykietaKosztow
+                        : w.cena === 0 && !prog
+                          ? "Bezpłatne"
+                          : `${formatujKwote(cena)}${prog ? ` · ${prog}` : ""}${w.trybZapisu === "terminy" ? " / termin" : ""}`}
                     </span>
                     <span className="text-sm font-semibold text-brand-deep transition group-hover:translate-x-1">
                       Szczegóły i zapisy →

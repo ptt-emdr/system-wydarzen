@@ -23,6 +23,8 @@ export type WydarzenieDoc = {
   cena: number;
   dniNaPlatnosc: number;
   limitMiejsc?: number | null;
+  zapisyDo?: string | null;
+  etykietaKosztow?: string | null;
   progiCenowe?: Prog[] | null;
   trybZapisu: "wydarzenie" | "terminy";
   terminy?: Termin[] | null;

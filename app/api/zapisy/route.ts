@@ -71,6 +71,16 @@ export async function POST(req: Request) {
     if (!w || !w.opublikowane) {
       return Response.json({ blad: "Zapisy na to wydarzenie są zamknięte." }, { status: 400 });
     }
+    if (
+      w.trybZapisu === "wydarzenie" &&
+      w.zapisyDo &&
+      new Date() > new Date(w.zapisyDo)
+    ) {
+      return Response.json(
+        { blad: "Zgłoszenia na to wydarzenie zostały już zakończone." },
+        { status: 409 },
+      );
+    }
 
     /* ---- terminy i limity ---- */
     let wybrane: string[] = [];
@@ -137,6 +147,17 @@ export async function POST(req: Request) {
         } else if (p.wymagane) {
           return Response.json({ blad: `Załącznik „${p.etykieta}” jest wymagany.` }, { status: 400 });
         }
+        continue;
+      }
+      if (p.typ === "wybor") {
+        const wartosci = dane
+          .getAll(`pole-${i}`)
+          .map((x) => String(x).trim())
+          .filter(Boolean);
+        if (p.wymagane && wartosci.length === 0) {
+          return Response.json({ blad: `Zaznacz co najmniej jedną odpowiedź w „${p.etykieta}”.` }, { status: 400 });
+        }
+        if (wartosci.length) odpowiedzi.push({ pytanie: p.etykieta, odpowiedz: wartosci.join("; ") });
         continue;
       }
       const wartosc = String(dane.get(`pole-${i}`) || "").trim();
@@ -212,7 +233,7 @@ export async function POST(req: Request) {
 
     /* dopisek przy włączonej weryfikacji: płatność normalnie, ale uczciwie
        informujemy o kontroli dokumentów i gwarancji zwrotu */
-    const weryfikacjaHtml = wymagaAkceptacji
+    const weryfikacjaHtml = wymagaAkceptacji && kwotaNalezna > 0
       ? `<p>Informacja: zgłoszenia na to wydarzenie podlegają weryfikacji
          załączonych dokumentów przez organizatora. Jeżeli rejestracja nie
          zostanie zamknięta pozytywnie, otrzymasz <b>zwrot wpłaconych
@@ -233,7 +254,11 @@ export async function POST(req: Request) {
            </table>
            ${w.instrukcjaPlatnosci ? `<p>${w.instrukcjaPlatnosci}</p>` : ""}
            <p>Brak wpłaty w terminie oznacza zwolnienie miejsca.</p>`
-        : `<p>Udział w wydarzeniu jest bezpłatny — Twoje miejsce jest potwierdzone.</p>`;
+        : wymagaAkceptacji
+          ? `<p>Twoje zgłoszenie zostało <b>przyjęte i przekazane do
+             weryfikacji</b>. Zapis nie wymaga na tym etapie żadnej płatności.
+             O wyniku weryfikacji poinformujemy osobnym e-mailem.</p>`
+          : `<p>Udział w wydarzeniu jest bezpłatny — Twoje miejsce jest potwierdzone.</p>`;
 
     try {
       await payload.sendEmail({
