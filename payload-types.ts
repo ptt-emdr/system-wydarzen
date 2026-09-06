@@ -156,6 +156,7 @@ export interface Wydarzenia {
   limitMiejsc?: number | null;
   zapisyDo?: string | null;
   etykietaKosztow?: string | null;
+  ukladZapisow?: ('obok' | 'pod') | null;
   akceptacjaUczestnikow?: boolean | null;
   listaRezerwowa?: boolean | null;
   /**
@@ -395,6 +396,7 @@ export interface WydarzeniaSelect<T extends boolean = true> {
   limitMiejsc?: T;
   zapisyDo?: T;
   etykietaKosztow?: T;
+  ukladZapisow?: T;
   akceptacjaUczestnikow?: T;
   listaRezerwowa?: T;
   progiCenowe?:

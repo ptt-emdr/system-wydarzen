@@ -25,6 +25,7 @@ export type WydarzenieDoc = {
   limitMiejsc?: number | null;
   zapisyDo?: string | null;
   etykietaKosztow?: string | null;
+  ukladZapisow?: "obok" | "pod" | null;
   progiCenowe?: Prog[] | null;
   trybZapisu: "wydarzenie" | "terminy";
   terminy?: Termin[] | null;

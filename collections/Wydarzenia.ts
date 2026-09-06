@@ -233,6 +233,23 @@ export const Wydarzenia: CollectionConfig = {
       ],
     },
     {
+      name: "ukladZapisow",
+      type: "select",
+      defaultValue: "obok",
+      label: { pl: "Układ strony wydarzenia", en: "Layout" },
+      options: [
+        { value: "obok", label: { pl: "Zapisy obok tekstu (kolumna boczna)", en: "Form beside text" } },
+        { value: "pod", label: { pl: "Zapisy pod tekstem (pełna szerokość)", en: "Form below text" } },
+      ],
+      admin: {
+        position: "sidebar",
+        description: {
+          pl: "„Pod tekstem” sprawdza się przy długich formularzach (np. rekrutacje z wieloma polami).",
+          en: "",
+        },
+      },
+    },
+    {
       name: "akceptacjaUczestnikow",
       type: "checkbox",
       defaultValue: false,

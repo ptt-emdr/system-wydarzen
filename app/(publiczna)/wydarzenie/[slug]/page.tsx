@@ -65,6 +65,8 @@ export default async function StronaWydarzenia({
     w.trybZapisu === "wydarzenie" &&
     Boolean((w as { listaRezerwowa?: boolean }).listaRezerwowa);
 
+  const ukladPod = w.ukladZapisow === "pod";
+
   return (
     <>
       <section className="bg-cream">
@@ -106,7 +108,13 @@ export default async function StronaWydarzenia({
         </svg>
       </section>
 
-      <section className="mx-auto grid max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[1fr_420px]">
+      <section
+        className={
+          ukladPod
+            ? "mx-auto grid max-w-5xl gap-10 px-5 py-10"
+            : "mx-auto grid max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[1fr_420px]"
+        }
+      >
         <article className="space-y-4 text-lg leading-relaxed text-ink/85">
           {/* akapity po pustej linii; **tekst** = pogrubienie */}
           {w.opis.split(/\n\s*\n/).map((akapit, i) => (
@@ -148,7 +156,7 @@ export default async function StronaWydarzenia({
           ) : null}
         </article>
 
-        <aside>
+        <aside className={ukladPod ? "mx-auto w-full max-w-3xl" : undefined}>
           {brakMiejsc && !trybRezerwowy ? (
             <div className="rounded-2xl border border-ink/15 bg-ink/5 p-6 text-center opacity-90">
               <p className="font-display text-xl font-semibold text-ink/60">
