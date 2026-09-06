@@ -304,7 +304,31 @@ strony). Wdrożone (commit `b71dd58`):
 - Konta panelu: Krzysztof (założone); promocja@emdr.org.pl — do
   założenia.
 
-### 15.4. Otwarte pozycje audytu
+### 15.4. Rozszerzenia pod rekrutacje programów (06.09.2026)
+
+Wdrożone dla Programu Superwizyjnego DiM, dostępne dla każdego wydarzenia:
+
+- **„Zapisy do" na poziomie wydarzenia** (tryb „całe wydarzenie"):
+  po terminie formularz zamyka się sam (strona: komunikat „Zgłoszenia
+  przyjmowaliśmy do…", API: 409); zamyka też listę rezerwową. Migracja
+  `20260906_060202_dim_rozszerzenia`.
+- **Etykieta kosztów**: własny tekst zamiast ceny na kaflu i stronie
+  (np. „250 zł za spotkanie — płatne w trakcie programu"); przy cenie 0
+  z akceptacją uczestników e-mail i ekran potwierdzenia NIE obiecują
+  „miejsca potwierdzonego", tylko informują o weryfikacji (wariant
+  rekrutacyjny).
+- **Typ pola „wybór wielokrotny"** w kreatorze (checkboxy; odpowiedzi
+  łączone średnikami; wymagane = min. jedna).
+- **Klikalne adresy www** w blokach informacyjnych i etykietach pól
+  formularza; **wypunktowania** w opisie wydarzenia zachowują łamanie
+  linii (`whitespace-pre-line`).
+- Strona `/regulamin-dim` — placeholder regulaminu Programu DiM
+  („Regulamin wkrótce"; treść docelowa przed publikacją wydarzenia).
+- Skrypt `scripts/wydarzenie-dim.ts` — tworzy (idempotentnie, jako
+  NIEOPUBLIKOWANE) wydarzenie rekrutacyjne DiM z 47 polami wg formularza
+  Komisji DiM (dokumenty: katalog „PROGRAM DiM" na Pulpicie).
+
+### 15.5. Otwarte pozycje audytu
 
 Backup automatyczny z próbnym restore, monitoring uptime, role
 kont/MFA, audit-log operacji — wspólne z planem strony głównej
