@@ -9,7 +9,9 @@ import {
   type WydarzenieDoc,
 } from "@/lib/wydarzenia";
 
-export const revalidate = 300;
+/* lista zawsze świeża — zmiany publikacji w panelu widać od razu
+   (wcześniejsza migawka ISR 300 s myliła obsługę po odznaczeniu) */
+export const dynamic = "force-dynamic";
 
 /** Lista opublikowanych wydarzeń — kafle w estetyce PTT. */
 export default async function ListaWydarzen() {
