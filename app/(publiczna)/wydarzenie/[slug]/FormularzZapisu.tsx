@@ -2,6 +2,19 @@
 
 import { useMemo, useState } from "react";
 
+/** Tekst z **pogrubieniami** (konwencja jak w opisie wydarzenia). */
+function zPogrubieniami(tekst: string): React.ReactNode[] {
+  return tekst.split(/\*\*(.+?)\*\*/g).map((czesc, i) =>
+    i % 2 === 1 ? (
+      <strong key={`b${i}`} className="font-bold text-ink">
+        {zLinkami(czesc)}
+      </strong>
+    ) : (
+      <span key={`t${i}`}>{zLinkami(czesc)}</span>
+    ),
+  );
+}
+
 /** Zamienia adresy www w tekście etykiety/bloku info na klikalne odnośniki. */
 function zLinkami(tekst: string): React.ReactNode[] {
   return tekst
@@ -258,8 +271,8 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
 
       {wydarzenie.pola.map((p, i) =>
         p.typ === "info" ? (
-          <p key={i} className="rounded-xl bg-cream p-3 text-sm text-ink/80">
-            {zLinkami(p.opcje || "")}
+          <p key={i} className="rounded-xl border-l-4 border-sun bg-cream p-3 text-sm text-ink/85">
+            {zPogrubieniami(p.opcje || "")}
           </p>
         ) : (
           <label key={i} className="block text-sm">
