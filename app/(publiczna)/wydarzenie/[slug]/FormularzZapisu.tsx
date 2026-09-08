@@ -353,10 +353,10 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
         {wysylanie
           ? "Wysyłanie…"
           : trybRezerwowy
-            ? "Zapisuję się na listę rezerwową"
+            ? "Wyślij zgłoszenie na listę rezerwową"
             : doZaplaty > 0
-              ? `Zapisuję się — do zapłaty ${kwota(doZaplaty)}`
-              : "Zapisuję się"}
+              ? `Wyślij zgłoszenie — do zapłaty ${kwota(doZaplaty)}`
+              : "Wyślij zgłoszenie"}
       </button>
       {!trybRezerwowy && doZaplaty > 0 ? (
         <p className="text-center text-xs text-ink/60">
