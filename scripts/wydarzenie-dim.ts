@@ -20,11 +20,13 @@ Osoby zainteresowane udziałem muszą spełniać poniższe warunki:
 • uczestniczą obecnie w 4-letnim szkoleniu psychoterapeutycznym (ukończyły co najmniej drugi rok), i/lub ukończyły 4-letnie szkolenie psychoterapeutyczne, i/lub posiadają specjalizację z psychoterapii dzieci i młodzieży, i/lub posiadają specjalizację z psychiatrii dzieci i młodzieży (zdany egzamin PES);
 • ukończyły pełne podstawowe szkolenie EMDR (obie części) oraz szkolenie EMDR dotyczące pracy z dziećmi i młodzieżą u jednego z akredytowanych trenerów EMDR C&A;
 • deklarują udział w dwuletnim cyklu superwizji grupowej programu - 21 h (w tym 15 h superwizji, po których następuje decyzja konsultanta/superwizora o kolejnych 6 h), trwającym maksymalnie 2 lata od dnia rozpoczęcia;
-• deklarują - co na etapie certyfikacji jest weryfikowane - spełnienie warunku ukończonych minimum 25 procesów psychoterapeutycznych EMDR i 50 sesji EMDR potwierdzonych przez akredytowanego konsultanta/superwizora EMDR C&A, w tym przedstawienie nagrań z sesji z dziećmi poniżej i powyżej 8. roku życia.
+• deklarują możliwość zrealizowania w trakcie trwania programu minimum 25 procesów psychoterapeutycznych EMDR i 50 sesji EMDR, potwierdzonych przez akredytowanego konsultanta/superwizora EMDR C&A. Spełnienie tego warunku będzie weryfikowane na etapie certyfikacji. Wymagane będzie również przedstawienie nagrań sesji z dziećmi poniżej i powyżej 8. roku życia.
 
-**Grupy superwizyjne** poprowadzą akredytowani trenerzy/konsultanci EMDR C&A: **Susan Darker** (oraz wskazana przez nią konsultantka), **Esther Bar-Sadeh** (oraz wskazana przez nią konsultantka) i **Magdalena Wójcik**. Liczba miejsc jest ograniczona, a wskazanie preferencji nie gwarantuje przydziału do wybranej grupy.
+**Grupy superwizyjne** poprowadzą akredytowani trenerzy/konsultanci EMDR C&A: **Susan Darker-Smith** (oraz wskazana przez nią konsultantka), **Esther Bar-Sadeh** (oraz wskazana przez nią konsultantka) i **Magdalena Wójcik**.
 
-**Wyjątkowość programu:** Towarzystwo pokrywa koszty tłumaczeń (superwizje z zagranicznymi trenerami będą tłumaczone) oraz różnicę pomiędzy wynagrodzeniem międzynarodowych superwizorów a polskimi stawkami. Uczestnicy pokrywają koszty superwizji według stawki **250 zł za spotkanie grupowe**, płatnej przed spotkaniem (ostateczna stawka zostanie potwierdzona przed zawarciem umowy). Wymagana jest obecność na 90% superwizji, z możliwością uzupełnienia brakujących 10% u wybranego trenera/konsultanta EMDR C&A.
+Liczba miejsc jest ograniczona, a wskazanie preferencji nie gwarantuje przydziału do wybranej grupy.
+
+**Wyjątkowość programu:** Towarzystwo pokrywa koszty tłumaczeń (superwizje z zagranicznymi trenerami będą tłumaczone) oraz różnicę pomiędzy wynagrodzeniem międzynarodowych superwizorów a polskimi stawkami. Uczestnicy pokrywają koszty superwizji grupowej w wysokości **250 zł za spotkanie**, płatne przed każdym spotkaniem. Wymagana jest obecność na 90% superwizji, z możliwością uzupełnienia brakujących 10% u wybranego trenera/konsultanta EMDR C&A.
 
 **Cele programu:**
 
@@ -36,7 +38,7 @@ Osoby zainteresowane udziałem muszą spełniać poniższe warunki:
 
 **Korzyści z udziału:** dostęp do międzynarodowych superwizorów, wysokiej jakości treści merytoryczne, wsparcie organizacyjne oraz praktyczne i formalnie uznawane przygotowanie do pracy klinicznej z dziećmi i młodzieżą.
 
-**Zgłoszenia przyjmujemy do 30 września 2026 r., godz. 23:59.** Samo przesłanie formularza nie oznacza zakwalifikowania do programu - Komisja Dzieci i Młodzieży PTT EMDR potwierdzi otrzymanie zgłoszenia, a wynik weryfikacji dokumentów przekaże w terminie do 21 dni. O przyjęciu decydują spełnienie kryteriów formalnych oraz kolejność kompletnych zgłoszeń. Realizacja programu: lata 2027–2029.
+**Zgłoszenia przyjmujemy do 30 września 2026 r., godz. 23:59.** Samo przesłanie formularza nie oznacza zakwalifikowania do programu - Komisja Dzieci i Młodzieży PTT EMDR potwierdzi otrzymanie zgłoszenia, a wynik weryfikacji dokumentów przekaże w terminie do 21 dni. O przyjęciu decyduje spełnienie kryteriów formalnych, ocena merytoryczna zgłoszenia oraz kolejność kompletnych zgłoszeń. Realizacja programu: lata 2026–2029.
 
 W razie pytań prosimy o kontakt: dim@emdr.org.pl`;
 
@@ -94,9 +96,9 @@ const POLA: Pole[] = [
   { typ: "checkbox", etykieta: "Potwierdzam, że informacje podane w formularzu są zgodne z prawdą i mogą zostać zweryfikowane na podstawie załączonych dokumentów", wymagane: true },
   { typ: "checkbox", etykieta: "Deklaruję gotowość udziału w programie trwającym maksymalnie 24 miesiące, obejmującym 15 godzin obowiązkowej superwizji grupowej oraz - po pozytywnej decyzji konsultanta/superwizora EMDR C&A - kolejne 6 godzin superwizji", wymagane: true },
   { typ: "checkbox", etykieta: "Deklaruję udział w co najmniej 90% superwizji grupowych oraz gotowość uzupełnienia dopuszczalnej nieobecności na zasadach określonych w regulaminie programu", wymagane: true },
-  { typ: "checkbox", etykieta: "Deklaruję aktywny udział w superwizji, w tym przedstawienie co najmniej jednego przypadku klinicznego, z zachowaniem pełnej anonimowości pacjentów i/lub innych wskazanych przez superwizora wymagań związanych z przystąpieniem do ścieżki Practitionera C&A", wymagane: true },
+  { typ: "checkbox", etykieta: "Deklaruję aktywny udział w superwizji, w tym przedstawienie wymaganej przez superwizora liczby przypadków klinicznych, z zachowaniem pełnej anonimowości pacjentów oraz spełnienie innych wymagań wskazanych przez superwizora, związanych z realizacją ścieżki Practitioner C&A", wymagane: true },
   { typ: "checkbox", etykieta: "Zobowiązuję się do przestrzegania zasad poufności, etyki zawodowej, ochrony danych oraz zasad bezpiecznego prezentowania przypadków i nagrań sesji", wymagane: true },
-  { typ: "checkbox", etykieta: "Przyjmuję do wiadomości, że opłata za spotkanie superwizji grupowej jest planowana w wysokości 250 zł, płatna przed spotkaniem, a ostateczna stawka zostanie podana przed zawarciem umowy / przyjęciem regulaminu", wymagane: true },
+  { typ: "checkbox", etykieta: "Przyjmuję do wiadomości, że opłata za spotkanie superwizji grupowej wynosi 250 zł, płatna przed spotkaniem", wymagane: true },
   { typ: "checkbox", etykieta: "Deklaruję gotowość pokrywania kosztów superwizji grupowej przez cały wymagany cykl. Przyjmuję do wiadomości, że projekt regulaminu przewiduje w razie rezygnacji obowiązek pokrycia kosztów pozostałych obowiązkowych sesji do łącznego wymiaru 15 godzin; warunek ten wymaga przedstawienia i zaakceptowania w finalnym regulaminie lub umowie", wymagane: true },
   { typ: "checkbox", etykieta: "Przyjmuję do wiadomości, że udział w programie nie gwarantuje uzyskania certyfikatu Practitioner EMDR C&A; decyzja o gotowości do dalszego etapu należy do akredytowanego konsultanta/superwizora, a warunki certyfikacji są weryfikowane odrębnie", wymagane: true },
   { typ: "checkbox", etykieta: "Zapoznałem/-am się z regulaminem programu i akceptuję jego warunki (regulamin: wydarzenia.emdr.org.pl/regulamin-dim)", wymagane: true },
@@ -135,7 +137,7 @@ const w = await payload.create({
     dniNaPlatnosc: 3,
     limitMiejsc: 10,
     zapisyDo: "2026-09-30T21:59:00.000Z",
-    etykietaKosztow: "250 zł za spotkanie superwizyjne - płatne w trakcie programu",
+    etykietaKosztow: "250 zł za spotkanie superwizji grupowej - płatne przed każdym spotkaniem",
     trybZapisu: "wydarzenie",
     akceptacjaUczestnikow: true,
     listaRezerwowa: true,
