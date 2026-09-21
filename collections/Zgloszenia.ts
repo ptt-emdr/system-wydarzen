@@ -143,6 +143,15 @@ export const Zgloszenia: CollectionConfig = {
   fields: [
     { name: "opisowy", type: "text", admin: { hidden: true } },
     {
+      /* link do karty zgłoszenia do wydruku / zapisu PDF (segregator) */
+      name: "kartaUI",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: { Field: "/components/admin/KartaZgloszeniaLink#KartaZgloszeniaLink" },
+      },
+    },
+    {
       type: "row",
       fields: [
         { name: "imie", type: "text", required: true, label: { pl: "Imię", en: "First name" }, admin: { width: "33%" } },
@@ -299,6 +308,14 @@ export const Zgloszenia: CollectionConfig = {
       relationTo: "zalaczniki-zgloszen",
       hasMany: true,
       label: { pl: "Załączniki (np. certyfikat)", en: "Attachments" },
+    },
+    {
+      /* podgląd załączników z przyciskiem „Zobacz załącznik" (nowa karta) */
+      name: "podgladZalacznikowUI",
+      type: "ui",
+      admin: {
+        components: { Field: "/components/admin/PodgladZalacznikow#PodgladZalacznikow" },
+      },
     },
     {
       name: "chceFakture",

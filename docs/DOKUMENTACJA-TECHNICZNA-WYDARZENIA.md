@@ -328,7 +328,33 @@ Wdrożone dla Programu Superwizyjnego DiM, dostępne dla każdego wydarzenia:
   NIEOPUBLIKOWANE) wydarzenie rekrutacyjne DiM z 47 polami wg formularza
   Komisji DiM (dokumenty: katalog „PROGRAM DiM" na Pulpicie).
 
-### 15.5. Otwarte pozycje audytu
+### 15.5. Karta zgłoszenia PDF i podgląd załączników (21.09.2026)
+
+Przeniesione wzorce z modułu deklaracji strony głównej:
+
+- **Karta zgłoszenia do wydruku / PDF**: strona `/karta-zgloszenia/[id]`
+  (`app/karta-zgloszenia/`, własny minimalny layout, `force-dynamic`,
+  noindex) — auth przez `payload.auth({ headers })`, bez logowania tylko
+  odsyłacz do panelu. Sekcje: wydarzenie, dane uczestnika, status
+  i płatności (w tym lista wpłat i kod przelewu), dane do faktury
+  (warunkowo), wszystkie odpowiedzi z formularza, załączniki + pusty
+  box „Decyzja organizatora / podpis"; stopka systemowa z nr zgłoszenia
+  i adnotacją RODO. PDF przez `window.print()` (`DrukujKarte`,
+  `.bez-druku`, `@page A4`). Logo ładowane z `https://emdr.org.pl/…` —
+  ta aplikacja nie ma katalogu `public/`. Link w panelu: pole ui
+  `kartaUI` (sidebar zgłoszenia,
+  `components/admin/KartaZgloszeniaLink.tsx`).
+- **Podgląd załączników zgłoszenia**: pole ui `podgladZalacznikowUI`
+  pod relacją `zalaczniki` (`components/admin/PodgladZalacznikow.tsx`,
+  sparametryzowany `pole`) — lista plików z rozmiarem i przyciskiem
+  „Zobacz załącznik ↗" otwierającym plik w nowej karcie przez
+  access-controlled `/api/zalaczniki-zgloszen/file/…` (200 z sesją
+  admina, 403 anonimowo — potwierdzone E2E).
+- Pola `ui` są wirtualne — bez migracji; po dodaniu komponentów
+  odświeżyć `app/(payload)/admin/importMap.js`
+  (`npx payload generate:importmap`).
+
+### 15.6. Otwarte pozycje audytu
 
 Backup automatyczny z próbnym restore, monitoring uptime, role
 kont/MFA, audit-log operacji — wspólne z planem strony głównej

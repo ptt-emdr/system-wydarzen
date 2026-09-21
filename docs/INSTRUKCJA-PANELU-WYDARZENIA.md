@@ -1,6 +1,6 @@
 # Instrukcja obsługi panelu — System zapisów na wydarzenia PTT EMDR
 
-**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej** · wersja 1.1 · 20.08.2026
+**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej** · wersja 1.2 · 21.09.2026
 (w czasie testów: http://localhost:3100)
 
 ---
@@ -190,3 +190,20 @@ Dwie zasady:
 
 Innego formatowania (kursywa, listy, linki) w opisie nie ma — to
 świadoma decyzja, żeby panel pozostał prosty.
+
+## 11. Karta zgłoszenia (PDF) i podgląd załączników (od 21.09.2026)
+
+Po wejściu w pojedyncze zgłoszenie (Wydarzenia → Zgłoszenia → kliknij
+osobę) masz dwie nowe rzeczy:
+
+- **Granatowy przycisk „🖨 Karta zgłoszenia — PDF / wydruk"** (prawa
+  kolumna, na górze) — otwiera w nowej karcie czytelną kartę zgłoszenia:
+  wydarzenie, dane uczestnika, status i wpłaty, dane do faktury,
+  wszystkie odpowiedzi z formularza, lista załączników oraz puste pole
+  na decyzję i podpis. Przycisk „Drukuj / zapisz jako PDF" uruchamia
+  systemowe okno drukowania — wybierz drukarkę albo „Zapisz jako PDF"
+  (do segregatora). Karta działa tylko po zalogowaniu do panelu.
+- **Lista załączników z przyciskiem „Zobacz załącznik ↗"** — pod polem
+  „Załączniki" każdy plik ma swój wiersz (nazwa + rozmiar); kliknięcie
+  otwiera plik w nowej karcie przeglądarki. Pliki są chronione — osoba
+  bez zalogowania nie otworzy ich nawet ze skopiowanym adresem.
