@@ -49,3 +49,7 @@ payload-dev.db-*
 /uploads/
 wydarzenia-dev.db
 uploads/
+
+# lokalne bazy SQLite — nigdy w repo
+*.db
+*.db.bak*
