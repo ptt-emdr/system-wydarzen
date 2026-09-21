@@ -202,7 +202,11 @@ osobę) masz dwie nowe rzeczy:
   wszystkie odpowiedzi z formularza, lista załączników oraz puste pole
   na decyzję i podpis. Przycisk „Drukuj / zapisz jako PDF" uruchamia
   systemowe okno drukowania — wybierz drukarkę albo „Zapisz jako PDF"
-  (do segregatora). Karta działa tylko po zalogowaniu do panelu.
+  (do segregatora). Obok jest też przycisk **„⬇ Pobierz PDF"**, który od
+  razu zapisuje gotowy plik PDF na dysk (bez okna drukowania) — wygodne
+  do wysyłki e-mailem lub archiwum komisji. Przy długich formularzach
+  tabela odpowiedzi przechodzi płynnie na kolejne strony A4. Karta
+  działa tylko po zalogowaniu do panelu.
 - **Lista załączników z przyciskiem „Zobacz załącznik ↗"** — pod polem
   „Załączniki" każdy plik ma swój wiersz (nazwa + rozmiar); kliknięcie
   otwiera plik w nowej karcie przeglądarki. Pliki są chronione — osoba

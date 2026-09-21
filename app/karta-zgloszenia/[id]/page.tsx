@@ -123,10 +123,9 @@ export default async function KartaZgloszenia({
         /* ---- podział na strony A4 ----
            - krótkie sekcje (.sekcja) nigdy nie łamią się w środku:
              jeżeli nie mieszczą się na stronie, przechodzą w całości,
-           - długa tabela odpowiedzi łamie się MIĘDZY wierszami,
-             a jej nagłówek powtarza się na każdej stronie,
-           - przy rozbudowanych formularzach (.nowa-strona) odpowiedzi
-             zaczynają się od świeżej strony */
+           - długa tabela odpowiedzi płynie przez kolejne strony i łamie
+             się MIĘDZY wierszami, a jej nagłówek powtarza się na każdej
+             stronie (decyzja 21.09: bez wymuszania nowej strony) */
         @media print {
           body { background: #fff !important; }
           .bez-druku { display: none !important; }
@@ -134,7 +133,6 @@ export default async function KartaZgloszenia({
           header { break-after: avoid; }
           h2 { break-after: avoid; break-inside: avoid; }
           .sekcja { break-inside: avoid; }
-          .nowa-strona { break-before: page; }
           tr { break-inside: avoid; }
           thead { display: table-header-group; }
           footer { break-inside: avoid; }
@@ -144,7 +142,24 @@ export default async function KartaZgloszenia({
         td, th { word-break: break-word; }
       `}</style>
 
-      <div className="bez-druku" style={{ textAlign: "right", marginBottom: "12px" }}>
+      <div
+        className="bez-druku"
+        style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginBottom: "12px" }}
+      >
+        <a
+          href={`/karta-zgloszenia/${id}/pdf`}
+          style={{
+            padding: "10px 18px",
+            borderRadius: "999px",
+            background: "#2c667f",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: "13px",
+            textDecoration: "none",
+          }}
+        >
+          ⬇ Pobierz PDF
+        </a>
         <DrukujKarte />
       </div>
 
@@ -218,10 +233,7 @@ export default async function KartaZgloszenia({
         </section>
       ) : null}
 
-      {/* rozbudowany formularz (rekrutacje) → odpowiedzi od nowej strony;
-          krótki formularz zostaje w miejscu, a tabela i tak łamie się
-          wyłącznie między wierszami */}
-      <section className={odpowiedzi.length > 12 ? "nowa-strona" : undefined}>
+      <section>
         <h2 style={naglowek}>{z.chceFakture ? "5" : "4"}. Odpowiedzi z formularza zgłoszeniowego</h2>
         {odpowiedzi.length ? (
           <table>

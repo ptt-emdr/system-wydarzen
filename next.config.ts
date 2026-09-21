@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
   },
   /* strona nie może zdradzać, na czym stoi */
   poweredByHeader: false,
+  /* generator PDF karty zgłoszenia: pakiet ładowany z node_modules
+     w czasie działania (nie bundlowany — silnik układu yoga/wasm),
+     a czcionki DejaVu (polskie znaki) dołączane do paczki standalone */
+  serverExternalPackages: ["@react-pdf/renderer"],
+  outputFileTracingIncludes: {
+    "/karta-zgloszenia/**": [
+      "./node_modules/dejavu-fonts-ttf/ttf/DejaVuSans.ttf",
+      "./node_modules/dejavu-fonts-ttf/ttf/DejaVuSans-Bold.ttf",
+    ],
+  },
   /* nagłówki bezpieczeństwa (audyt 19.08.2026) — HSTS bez preload,
      CSP na razie wyłącznie raportująco (panel Payload używa inline
      skryptów/stylów; zaostrzenie po okresie obserwacji) */

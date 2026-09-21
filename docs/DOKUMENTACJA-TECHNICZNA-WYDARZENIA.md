@@ -353,6 +353,16 @@ Przeniesione wzorce z modułu deklaracji strony głównej:
 - Pola `ui` są wirtualne — bez migracji; po dodaniu komponentów
   odświeżyć `app/(payload)/admin/importMap.js`
   (`npx payload generate:importmap`).
+- **Pobieranie PDF** (21.09): przycisk „Pobierz PDF" obok „Drukuj" —
+  endpoint `GET /karta-zgloszenia/[id]/pdf` (`pdf/route.ts` +
+  `pdf/dokument.tsx`) generuje plik serwerowo przez @react-pdf/renderer
+  (czcionka DejaVu Sans — polskie znaki; pakiet w `serverExternalPackages`,
+  TTF-y dociągane do standalone przez `outputFileTracingIncludes`).
+  Te same reguły dostępu co strona karty (403 bez logowania,
+  administrator jednego wydarzenia tylko swoje). Wydruk przeglądarkowy:
+  sekcje w całości, tabela odpowiedzi płynie przez strony (łamanie
+  wyłącznie między wierszami, nagłówek tabeli powtarzany) — bez
+  wymuszania nowej strony.
 
 ### 15.6. Role kont, powiadomienia i indywidualna treść potwierdzenia (21.09.2026)
 

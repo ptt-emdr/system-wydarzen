@@ -8,6 +8,15 @@
         "value": "arial",
         "createdAt": "2026-09-21T09:14:51.963Z",
         "reason": "szablon e-maila transakcyjnego: Arial celowo, bo klienty pocztowe nie ładują webfontów; spójne z pozostałymi mailami systemu"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/(publiczna)/wydarzenie/[slug]/FormularzZapisu.tsx"
+        ],
+        "createdAt": "2026-09-21T17:22:46.901Z",
+        "reason": "bloki informacyjne formularza z żółtym akcentem border-l-4 border-sun to celowy, wcześniej zatwierdzony element języka wizualnego wydarzeń (decyzja z prac nad DiM 06.09.2026); istniały przed dzisiejszą edycją obsługi błędów"
       }
     ]
   }
