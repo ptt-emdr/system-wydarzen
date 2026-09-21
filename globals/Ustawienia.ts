@@ -1,12 +1,16 @@
 import type { GlobalConfig } from "payload";
-import { kazdy, tylkoAdmin } from "../collections/wspolne";
+import { jestPelnymAdminem, kazdy, tylkoPelnyAdmin } from "../collections/wspolne";
 
-/** Ustawienia systemu wydarzeń: dane organizatora i rachunek do przelewów. */
+/** Ustawienia systemu wydarzeń: dane organizatora i rachunek do przelewów.
+    Zmienia je wyłącznie pełny Administrator. */
 export const Ustawienia: GlobalConfig = {
   slug: "ustawienia",
   label: { pl: "Ustawienia", en: "Settings" },
-  access: { read: kazdy, update: tylkoAdmin },
-  admin: { group: { pl: "Administracja", en: "Administration" } },
+  access: { read: kazdy, update: tylkoPelnyAdmin },
+  admin: {
+    group: { pl: "Administracja", en: "Administration" },
+    hidden: ({ user }) => !jestPelnymAdminem(user),
+  },
   fields: [
     {
       name: "organizator",

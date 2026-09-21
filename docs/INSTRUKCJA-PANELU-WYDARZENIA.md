@@ -1,6 +1,6 @@
 # Instrukcja obsługi panelu — System zapisów na wydarzenia PTT EMDR
 
-**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej** · wersja 1.2 · 21.09.2026
+**Dla osoby obsługującej wydarzenia, bez wiedzy technicznej** · wersja 1.3 · 21.09.2026
 (w czasie testów: http://localhost:3100)
 
 ---
@@ -207,3 +207,41 @@ osobę) masz dwie nowe rzeczy:
   „Załączniki" każdy plik ma swój wiersz (nazwa + rozmiar); kliknięcie
   otwiera plik w nowej karcie przeglądarki. Pliki są chronione — osoba
   bez zalogowania nie otworzy ich nawet ze skopiowanym adresem.
+
+## 12. Administrator jednego wydarzenia (od 21.09.2026)
+
+Możesz dać komisji (np. DiM) konto, które widzi TYLKO jedno wydarzenie:
+
+1. Administratorzy → **Utwórz nowego** → podaj e-mail i hasło.
+2. W polu **Rola** wybierz „Administrator jednego wydarzenia".
+3. W polu **Przypisane wydarzenie** wskaż wydarzenie — gotowe.
+
+Takie konto po zalogowaniu:
+
+- widzi wyłącznie swoje wydarzenie, jego zgłoszenia i załączniki;
+  może otwierać karty PDF zgłoszeń, przeglądać kartę wydarzenia
+  (Panel raportów) i pobierać eksporty Excel/CSV,
+- w wydarzeniu może edytować **tylko Opis** — pozostałe pola (daty,
+  ceny, limity, publikacja…) są wygaszone, z żółtym komunikatem
+  „Zmiana wymagana przez Administratora",
+- **nie może**: wydawać decyzji Akceptuj/Odrzuć, zmieniać ani usuwać
+  zgłoszeń, dopisywać wpłat, wysyłać przypomnień, zarządzać kontami
+  i Ustawieniami.
+
+Pełne uprawnienia ma nadal rola „Administrator" (Twoje konto).
+
+## 13. Powiadomienia o zgłoszeniach i własna treść potwierdzenia (od 21.09.2026)
+
+Na końcu formularza wydarzenia są dwa nowe pola:
+
+- **„Przesyłaj powiadomienia o nowych zgłoszeniach na adres"** — na te
+  adresy przychodzi krótki e-mail o każdym nowym zgłoszeniu (kto,
+  wydarzenie, status, link do zgłoszenia w panelu). Domyślnie
+  sekretarz@emdr.org.pl; kilka adresów oddziel przecinkami, np.
+  `sekretarz@emdr.org.pl, dim@emdr.org.pl`.
+- **„Indywidualna treść e-maila potwierdzenia (wstęp)"** — własny tekst,
+  który zastępuje standardowe „dziękujemy za zgłoszenie…" w e-mailu do
+  osoby zapisującej się. Pusta linia = nowy akapit, `**tekst**` =
+  pogrubienie. Powitanie, dane do przelewu, kwotę i link do zgłoszenia
+  system dokleja sam — nie wpisuj ich tutaj. Puste pole = tekst
+  standardowy.

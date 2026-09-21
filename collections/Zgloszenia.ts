@@ -1,6 +1,6 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Where } from "payload";
 import crypto from "crypto";
-import { tylkoAdmin } from "./wspolne";
+import { idWydarzeniaKonta, jestPelnymAdminem, tylkoPelnyAdmin } from "./wspolne";
 import { eskapujHtml } from "../lib/wydarzenia";
 
 /**
@@ -20,10 +20,17 @@ export const Zgloszenia: CollectionConfig = {
     plural: { pl: "Zgłoszenia", en: "Registrations" },
   },
   access: {
-    read: tylkoAdmin,
-    create: tylkoAdmin,
-    update: tylkoAdmin,
-    delete: tylkoAdmin,
+    /* administrator jednego wydarzenia: zgłoszenia TYLKO swojego
+       wydarzenia i wyłącznie do odczytu (podgląd, karta PDF, eksport);
+       zmiany, decyzje i usuwanie — pełny Administrator */
+    read: ({ req }): boolean | Where => {
+      if (!req.user) return false;
+      if (jestPelnymAdminem(req.user)) return true;
+      return { wydarzenie: { equals: idWydarzeniaKonta(req.user) ?? 0 } };
+    },
+    create: tylkoPelnyAdmin,
+    update: tylkoPelnyAdmin,
+    delete: tylkoPelnyAdmin,
   },
   admin: {
     useAsTitle: "opisowy",
@@ -142,6 +149,22 @@ export const Zgloszenia: CollectionConfig = {
   },
   fields: [
     { name: "opisowy", type: "text", admin: { hidden: true } },
+    {
+      /* komunikat trybu podglądu dla administratora jednego wydarzenia */
+      name: "komunikatRoliUI",
+      type: "ui",
+      admin: {
+        components: {
+          Field: {
+            path: "/components/admin/KomunikatRoli#KomunikatRoli",
+            clientProps: {
+              tekst:
+                "Zgłoszenia przeglądasz w trybie podglądu — karta PDF, załączniki i eksport są dostępne. Decyzje, zmiany i usuwanie: Zmiana wymagana przez Administratora.",
+            },
+          },
+        },
+      },
+    },
     {
       /* link do karty zgłoszenia do wydruku / zapisu PDF (segregator) */
       name: "kartaUI",

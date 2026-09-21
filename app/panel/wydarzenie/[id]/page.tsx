@@ -32,15 +32,19 @@ export default async function KartaWydarzenia({
 
   let w: WydarzenieDoc & { typ?: string; listaRezerwowa?: boolean; opublikowane?: boolean };
   try {
+    /* reguły dostępu: administrator jednego wydarzenia otworzy
+       wyłącznie kartę swojego wydarzenia */
     w = (await payload.findByID({
       collection: "wydarzenia",
       id,
       depth: 0,
-      overrideAccess: true,
+      overrideAccess: false,
+      user,
     })) as typeof w;
   } catch {
     notFound();
   }
+  const pelnyAdmin = ((user as { rola?: string }).rola ?? "pelny") === "pelny";
   const s = await statystykiWydarzenia(payload, id);
   const { naTermin } = await zajetosc(payload, id);
   const wolne = w.limitMiejsc ? Math.max(w.limitMiejsc - s.zapisani, 0) : null;
@@ -195,9 +199,11 @@ export default async function KartaWydarzenia({
               </tbody>
             </table>
           </div>
-          <div className="bez-druku mt-3">
-            <PrzypomnijButton wydarzenieId={String(w.id)} liczba={s.nieoplaceni.length} />
-          </div>
+          {pelnyAdmin ? (
+            <div className="bez-druku mt-3">
+              <PrzypomnijButton wydarzenieId={String(w.id)} liczba={s.nieoplaceni.length} />
+            </div>
+          ) : null}
         </>
       )}
 

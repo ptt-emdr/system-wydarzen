@@ -1,3 +1,4 @@
+import { KomunikatRoli as KomunikatRoli_fef35b4ad64387c3596f4a5a316a5300 } from '../../../components/admin/KomunikatRoli'
 import { LinkPanelu as LinkPanelu_4dc98818cb5994115a62b76e9e6b20f5 } from '../../../components/admin/LinkPanelu'
 import { KartaZgloszeniaLink as KartaZgloszeniaLink_ce4de7a0fde696158ad22e630efb6885 } from '../../../components/admin/KartaZgloszeniaLink'
 import { AkceptacjaPrzyciski as AkceptacjaPrzyciski_5830a2088d8f7e92a0515bf9a33c0bc9 } from '../../../components/admin/AkceptacjaPrzyciski'
@@ -8,6 +9,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/admin/KomunikatRoli#KomunikatRoli": KomunikatRoli_fef35b4ad64387c3596f4a5a316a5300,
   "/components/admin/LinkPanelu#LinkPanelu": LinkPanelu_4dc98818cb5994115a62b76e9e6b20f5,
   "/components/admin/KartaZgloszeniaLink#KartaZgloszeniaLink": KartaZgloszeniaLink_ce4de7a0fde696158ad22e630efb6885,
   "/components/admin/AkceptacjaPrzyciski#AkceptacjaPrzyciski": AkceptacjaPrzyciski_5830a2088d8f7e92a0515bf9a33c0bc9,

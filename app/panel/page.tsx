@@ -21,12 +21,15 @@ export default async function ListaKart() {
       </p>
     );
   }
+  /* reguły dostępu kolekcji przycinają listę same — administrator
+     jednego wydarzenia widzi tu wyłącznie swoje wydarzenie */
   const { docs } = await payload.find({
     collection: "wydarzenia",
     sort: "-dataOd",
     limit: 100,
     depth: 0,
-    overrideAccess: true,
+    overrideAccess: false,
+    user,
   });
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDocumentInfo, useFormFields } from "@payloadcms/ui";
+import { useAuth, useDocumentInfo, useFormFields } from "@payloadcms/ui";
 
 /**
  * Przyciski „Akceptuj uczestnika" / „Odrzuć uczestnika" na karcie
@@ -17,12 +17,31 @@ const GOTOWE_POWODY = [
 
 export function AkceptacjaPrzyciski() {
   const { id } = useDocumentInfo();
+  const { user } = useAuth<{ rola?: string }>();
   const status = useFormFields(([fields]) => fields?.status?.value as string);
   const [tryb, setTryb] = useState<"start" | "odrzucanie" | "wysylka" | "gotowe">("start");
   const [powod, setPowod] = useState("");
   const [blad, setBlad] = useState("");
 
   if (!id || status !== "doAkceptacji" || tryb === "gotowe") return null;
+  /* decyzje wydaje wyłącznie pełny Administrator (API też to egzekwuje) */
+  if ((user?.rola ?? "pelny") === "wydarzenie") {
+    return (
+      <div
+        style={{
+          padding: "12px",
+          borderRadius: "8px",
+          border: "2px solid #fbbb15",
+          background: "var(--theme-elevation-50, #fffbe8)",
+          fontSize: "13px",
+        }}
+      >
+        <b>Zgłoszenie czeka na weryfikację.</b>
+        <br />
+        Decyzja (Akceptuj/Odrzuć) — Zmiana wymagana przez Administratora.
+      </div>
+    );
+  }
 
   async function decyzja(jaka: "akceptuj" | "odrzuc") {
     setBlad("");

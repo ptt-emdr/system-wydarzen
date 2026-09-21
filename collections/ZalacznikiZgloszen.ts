@@ -1,10 +1,17 @@
-import type { CollectionConfig } from "payload";
-import { katalogPlikow, tylkoAdmin } from "./wspolne";
+import type { CollectionConfig, Where } from "payload";
+import {
+  idWydarzeniaKonta,
+  jestPelnymAdminem,
+  katalogPlikow,
+  tylkoPelnyAdmin,
+} from "./wspolne";
 
 /**
  * Załączniki zgłoszeń (np. certyfikat szkolenia Dzieci i Młodzieży).
  * Tworzone wyłącznie przez endpoint /api/zapisy (create zamknięte);
- * ODCZYT tylko dla administratora — to dokumenty z danymi osobowymi.
+ * ODCZYT tylko po zalogowaniu — to dokumenty z danymi osobowymi.
+ * Administrator jednego wydarzenia widzi wyłącznie załączniki zgłoszeń
+ * swojego wydarzenia (pole „wydarzenie” wypełnia endpoint przy zapisie).
  */
 export const ZalacznikiZgloszen: CollectionConfig = {
   slug: "zalaczniki-zgloszen",
@@ -13,10 +20,14 @@ export const ZalacznikiZgloszen: CollectionConfig = {
     plural: { pl: "Załączniki zgłoszeń", en: "Registration attachments" },
   },
   access: {
-    create: tylkoAdmin,
-    read: tylkoAdmin,
-    update: tylkoAdmin,
-    delete: tylkoAdmin,
+    read: ({ req }): boolean | Where => {
+      if (!req.user) return false;
+      if (jestPelnymAdminem(req.user)) return true;
+      return { wydarzenie: { equals: idWydarzeniaKonta(req.user) ?? 0 } };
+    },
+    create: tylkoPelnyAdmin,
+    update: tylkoPelnyAdmin,
+    delete: tylkoPelnyAdmin,
   },
   admin: {
     group: { pl: "Wydarzenia", en: "Events" },
@@ -29,5 +40,16 @@ export const ZalacznikiZgloszen: CollectionConfig = {
     staticDir: katalogPlikow("zalaczniki-zgloszen"),
     mimeTypes: ["application/pdf", "image/jpeg", "image/png"],
   },
-  fields: [],
+  fields: [
+    {
+      name: "wydarzenie",
+      type: "relationship",
+      relationTo: "wydarzenia",
+      label: { pl: "Wydarzenie", en: "Event" },
+      admin: {
+        readOnly: true,
+        description: { pl: "Wypełniane automatycznie przy zapisie z formularza.", en: "" },
+      },
+    },
+  ],
 };

@@ -14,13 +14,17 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const wydarzenieId = url.searchParams.get("wydarzenie");
+  /* overrideAccess: false + user — reguły dostępu kolekcji przycinają
+     wynik same (administrator jednego wydarzenia dostaje wyłącznie
+     zgłoszenia swojego wydarzenia, niezależnie od parametru) */
   const { docs } = await payload.find({
     collection: "zgloszenia",
     where: wydarzenieId ? { wydarzenie: { equals: wydarzenieId } } : {},
     limit: 5000,
     depth: 1,
     sort: "nazwisko",
-    overrideAccess: true,
+    overrideAccess: false,
+    user,
   });
 
   const naglowki = [

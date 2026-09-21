@@ -1,5 +1,11 @@
-import type { CollectionConfig } from "payload";
-import { kazdy, tylkoAdmin, slugify } from "./wspolne";
+import type { CollectionConfig, Where } from "payload";
+import {
+  edytujeTylkoPelnyAdmin,
+  idWydarzeniaKonta,
+  jestPelnymAdminem,
+  slugify,
+  tylkoPelnyAdmin,
+} from "./wspolne";
 
 /**
  * Wydarzenia PTT EMDR (szkolenia, superwizje, cykle, konferencje).
@@ -17,10 +23,22 @@ export const Wydarzenia: CollectionConfig = {
     plural: { pl: "Wydarzenia", en: "Events" },
   },
   access: {
-    read: ({ req }) => (req.user ? true : { opublikowane: { equals: true } }),
-    create: tylkoAdmin,
-    update: tylkoAdmin,
-    delete: tylkoAdmin,
+    /* bez logowania: tylko opublikowane; administrator jednego wydarzenia:
+       tylko swoje wydarzenie; pełny Administrator: wszystko */
+    read: ({ req }): boolean | Where => {
+      if (!req.user) return { opublikowane: { equals: true } };
+      if (jestPelnymAdminem(req.user)) return true;
+      return { id: { equals: idWydarzeniaKonta(req.user) ?? 0 } };
+    },
+    update: ({ req }): boolean | Where => {
+      if (jestPelnymAdminem(req.user)) return true;
+      if (!req.user) return false;
+      /* edycja własnego wydarzenia — ale pola poza opisem mają
+         dodatkowo blokadę edytujeTylkoPelnyAdmin */
+      return { id: { equals: idWydarzeniaKonta(req.user) ?? 0 } };
+    },
+    create: tylkoPelnyAdmin,
+    delete: tylkoPelnyAdmin,
   },
   admin: {
     useAsTitle: "tytul",
@@ -44,13 +62,31 @@ export const Wydarzenia: CollectionConfig = {
   },
   fields: [
     {
+      /* komunikat dla administratora jednego wydarzenia (pozostali go nie widzą) */
+      name: "komunikatRoliUI",
+      type: "ui",
+      admin: {
+        components: {
+          Field: {
+            path: "/components/admin/KomunikatRoli#KomunikatRoli",
+            clientProps: {
+              tekst:
+                "Masz uprawnienia Administratora tego wydarzenia — możesz edytować opis. Pozostałe pola są tylko do odczytu: Zmiana wymagana przez Administratora.",
+            },
+          },
+        },
+      },
+    },
+    {
       name: "tytul",
+      access: edytujeTylkoPelnyAdmin,
       type: "text",
       required: true,
       label: { pl: "Nazwa wydarzenia", en: "Title" },
     },
     {
       name: "typ",
+      access: edytujeTylkoPelnyAdmin,
       type: "select",
       required: true,
       defaultValue: "szkolenie",
@@ -71,6 +107,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "slug",
+      access: edytujeTylkoPelnyAdmin,
       type: "text",
       unique: true,
       label: { pl: "Adres (slug)", en: "Slug" },
@@ -84,6 +121,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "opublikowane",
+      access: edytujeTylkoPelnyAdmin,
       type: "checkbox",
       defaultValue: false,
       label: { pl: "Opublikowane (widoczne i otwarte na zapisy)", en: "Published" },
@@ -129,6 +167,7 @@ export const Wydarzenia: CollectionConfig = {
       fields: [
         {
           name: "dataOd",
+          access: edytujeTylkoPelnyAdmin,
           type: "date",
           required: true,
           label: { pl: "Rozpoczęcie", en: "Start" },
@@ -136,12 +175,14 @@ export const Wydarzenia: CollectionConfig = {
         },
         {
           name: "dataDo",
+          access: edytujeTylkoPelnyAdmin,
           type: "date",
           label: { pl: "Zakończenie", en: "End" },
           admin: { width: "33%", date: { pickerAppearance: "dayAndTime", displayFormat: "dd.MM.yyyy HH:mm" } },
         },
         {
           name: "miejsce",
+          access: edytujeTylkoPelnyAdmin,
           type: "text",
           label: { pl: "Miejsce (lub „online”)", en: "Venue" },
           admin: { width: "33%" },
@@ -166,6 +207,7 @@ export const Wydarzenia: CollectionConfig = {
       fields: [
         {
           name: "cena",
+          access: edytujeTylkoPelnyAdmin,
           type: "number",
           required: true,
           min: 0,
@@ -177,6 +219,7 @@ export const Wydarzenia: CollectionConfig = {
         },
         {
           name: "dniNaPlatnosc",
+          access: edytujeTylkoPelnyAdmin,
           type: "number",
           required: true,
           defaultValue: 3,
@@ -192,6 +235,7 @@ export const Wydarzenia: CollectionConfig = {
         },
         {
           name: "limitMiejsc",
+          access: edytujeTylkoPelnyAdmin,
           type: "number",
           min: 1,
           label: { pl: "Limit miejsc (całe wydarzenie)", en: "Seat limit" },
@@ -207,6 +251,7 @@ export const Wydarzenia: CollectionConfig = {
       fields: [
         {
           name: "zapisyDo",
+          access: edytujeTylkoPelnyAdmin,
           type: "date",
           label: { pl: "Zapisy do (tryb „całe wydarzenie”)", en: "Registration deadline" },
           admin: {
@@ -220,6 +265,7 @@ export const Wydarzenia: CollectionConfig = {
         },
         {
           name: "etykietaKosztow",
+          access: edytujeTylkoPelnyAdmin,
           type: "text",
           label: { pl: "Etykieta kosztów (zamiast ceny)", en: "Cost label" },
           admin: {
@@ -234,6 +280,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "ukladZapisow",
+      access: edytujeTylkoPelnyAdmin,
       type: "select",
       defaultValue: "obok",
       label: { pl: "Układ strony wydarzenia", en: "Layout" },
@@ -251,6 +298,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "akceptacjaUczestnikow",
+      access: edytujeTylkoPelnyAdmin,
       type: "checkbox",
       defaultValue: false,
       label: { pl: "Akceptowanie uczestników (weryfikacja przed płatnością)", en: "Approval required" },
@@ -264,6 +312,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "listaRezerwowa",
+      access: edytujeTylkoPelnyAdmin,
       type: "checkbox",
       defaultValue: false,
       label: { pl: "Po wyczerpaniu limitu przyjmuj na listę rezerwową", en: "Waitlist" },
@@ -277,6 +326,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "progiCenowe",
+      access: edytujeTylkoPelnyAdmin,
       type: "array",
       label: { pl: "Progi cenowe (opcja: wczesna/późna rejestracja)", en: "Price tiers" },
       labels: { singular: { pl: "Próg", en: "Tier" }, plural: { pl: "Progi", en: "Tiers" } },
@@ -306,6 +356,7 @@ export const Wydarzenia: CollectionConfig = {
     /* ---------- terminy (cykl) ---------- */
     {
       name: "trybZapisu",
+      access: edytujeTylkoPelnyAdmin,
       type: "select",
       defaultValue: "wydarzenie",
       required: true,
@@ -323,6 +374,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "terminy",
+      access: edytujeTylkoPelnyAdmin,
       type: "array",
       label: { pl: "Terminy (dla cyklu)", en: "Sessions" },
       labels: { singular: { pl: "Termin", en: "Session" }, plural: { pl: "Terminy", en: "Sessions" } },
@@ -362,6 +414,7 @@ export const Wydarzenia: CollectionConfig = {
     /* ---------- kreator formularza ---------- */
     {
       name: "pola",
+      access: edytujeTylkoPelnyAdmin,
       type: "array",
       label: { pl: "Dodatkowe pola formularza", en: "Custom form fields" },
       labels: { singular: { pl: "Pole", en: "Field" }, plural: { pl: "Pola", en: "Fields" } },
@@ -410,6 +463,7 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "zbierajDaneFaktury",
+      access: edytujeTylkoPelnyAdmin,
       type: "checkbox",
       defaultValue: true,
       label: { pl: "Pokaż moduł „Proszę o wystawienie faktury”", en: "Invoice module" },
@@ -417,10 +471,43 @@ export const Wydarzenia: CollectionConfig = {
     },
     {
       name: "instrukcjaPlatnosci",
+      access: edytujeTylkoPelnyAdmin,
       type: "textarea",
       label: { pl: "Dopisek do instrukcji płatności (opcjonalny)", en: "Payment note" },
       admin: {
         description: { pl: "Rachunek i odbiorca przelewu są w Ustawieniach; tu można dodać zdanie specyficzne dla wydarzenia.", en: "" },
+      },
+    },
+    /* ---------- powiadomienia i treść odpowiedzi (21.09.2026) ---------- */
+    {
+      name: "powiadomieniaAdresy",
+      access: edytujeTylkoPelnyAdmin,
+      type: "text",
+      defaultValue: "sekretarz@emdr.org.pl",
+      label: {
+        pl: "Przesyłaj powiadomienia o nowych zgłoszeniach na adres",
+        en: "New-registration notifications to",
+      },
+      admin: {
+        description: {
+          pl: "Kilka adresów oddziel przecinkami (np. sekretarz@emdr.org.pl, dim@emdr.org.pl). Puste = adres kontaktowy z Ustawień. Powiadomienie jest krótkie: kto, wydarzenie, status i link do zgłoszenia w panelu.",
+          en: "",
+        },
+      },
+    },
+    {
+      name: "trescPotwierdzenia",
+      access: edytujeTylkoPelnyAdmin,
+      type: "textarea",
+      label: {
+        pl: "Indywidualna treść e-maila potwierdzenia (wstęp)",
+        en: "Custom confirmation e-mail intro",
+      },
+      admin: {
+        description: {
+          pl: "Zastępuje standardowy akapit „dziękujemy za zgłoszenie na…” w e-mailu do zgłaszającego. Powitanie („Dzień dobry…”), dane do przelewu, kwotę, termin i link do zgłoszenia system dokleja zawsze — nie trzeba ich tu wpisywać. Pusta linia = nowy akapit; **tekst w gwiazdkach** = pogrubienie. Puste pole = tekst standardowy.",
+          en: "",
+        },
       },
     },
   ],

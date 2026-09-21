@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-09-21T09:14:51.963Z",
+        "reason": "szablon e-maila transakcyjnego: Arial celowo, bo klienty pocztowe nie ładują webfontów; spójne z pozostałymi mailami systemu"
+      }
+    ]
+  }
+}

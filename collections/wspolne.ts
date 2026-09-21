@@ -12,6 +12,37 @@ import type { Access } from "payload";
 export const kazdy: Access = () => true;
 export const tylkoAdmin: Access = ({ req }) => Boolean(req.user);
 
+/* ---------- role kont (od 21.09.2026) ----------
+   „pelny" (domyślna, także dla kont sprzed wprowadzenia ról) = główny
+   Administrator; „wydarzenie" = Administrator jednego wydarzenia:
+   podgląd zgłoszeń i raportów TYLKO swojego wydarzenia, edycja
+   wyłącznie opisu, bez decyzji, usuwania i zmian płatności. */
+type KontoPanelu = {
+  rola?: string | null;
+  wydarzenie?: number | { id: number } | null;
+};
+
+export function jestPelnymAdminem(user: unknown): boolean {
+  if (!user) return false;
+  return ((user as KontoPanelu).rola ?? "pelny") === "pelny";
+}
+
+/** ID wydarzenia przypisanego kontu „Administrator jednego wydarzenia". */
+export function idWydarzeniaKonta(user: unknown): number | null {
+  const w = (user as KontoPanelu | null)?.wydarzenie;
+  if (typeof w === "number") return w;
+  if (w && typeof w === "object") return w.id;
+  return null;
+}
+
+export const tylkoPelnyAdmin: Access = ({ req }) => jestPelnymAdminem(req.user);
+
+/** Blokada pola dla administratora jednego wydarzenia (pole tylko do
+    odczytu w panelu — „Zmiana wymagana przez Administratora"). */
+export const edytujeTylkoPelnyAdmin = {
+  update: ({ req }: { req: { user?: unknown } }) => jestPelnymAdminem(req.user),
+};
+
 export const dostepPubliczny = {
   read: kazdy,
   create: tylkoAdmin,

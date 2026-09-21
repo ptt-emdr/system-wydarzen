@@ -192,6 +192,8 @@ export interface Wydarzenia {
     | null;
   zbierajDaneFaktury?: boolean | null;
   instrukcjaPlatnosci?: string | null;
+  powiadomieniaAdresy?: string | null;
+  trescPotwierdzenia?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -257,6 +259,7 @@ export interface Zgloszenia {
  */
 export interface ZalacznikiZgloszen {
   id: number;
+  wydarzenie?: (number | null) | Wydarzenia;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -276,6 +279,8 @@ export interface ZalacznikiZgloszen {
 export interface User {
   id: number;
   imieNazwisko?: string | null;
+  rola: 'pelny' | 'wydarzenie';
+  wydarzenie?: (number | null) | Wydarzenia;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -429,6 +434,8 @@ export interface WydarzeniaSelect<T extends boolean = true> {
       };
   zbierajDaneFaktury?: T;
   instrukcjaPlatnosci?: T;
+  powiadomieniaAdresy?: T;
+  trescPotwierdzenia?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -491,6 +498,7 @@ export interface ZgloszeniaSelect<T extends boolean = true> {
  * via the `definition` "zalaczniki-zgloszen_select".
  */
 export interface ZalacznikiZgloszenSelect<T extends boolean = true> {
+  wydarzenie?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -509,6 +517,8 @@ export interface ZalacznikiZgloszenSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   imieNazwisko?: T;
+  rola?: T;
+  wydarzenie?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

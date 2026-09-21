@@ -1,6 +1,7 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
+import { jestPelnymAdminem } from "@/collections/wspolne";
 
 /**
  * Wysyłka przypomnień o płatności do wszystkich nieopłaconych zgłoszeń
@@ -10,6 +11,12 @@ export async function POST(req: Request) {
   const payload = await getPayload({ config });
   const { user } = await payload.auth({ headers: req.headers });
   if (!user) return Response.json({ blad: "Wymagane logowanie." }, { status: 403 });
+  if (!jestPelnymAdminem(user)) {
+    return Response.json(
+      { blad: "Wysyłkę przypomnień uruchamia wyłącznie pełny Administrator." },
+      { status: 403 },
+    );
+  }
 
   const { wydarzenieId } = (await req.json()) as { wydarzenieId?: string };
   if (!wydarzenieId) return Response.json({ blad: "Brak wydarzenia." }, { status: 400 });

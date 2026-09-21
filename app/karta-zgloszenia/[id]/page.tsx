@@ -71,10 +71,14 @@ export default async function KartaZgloszenia({
     zalaczniki?: ({ filename?: string } | number)[] | null;
   };
   try {
+    /* reguły dostępu: administrator jednego wydarzenia otworzy kartę
+       wyłącznie zgłoszenia ze swojego wydarzenia */
     z = (await payload.findByID({
       collection: "zgloszenia",
       id,
       depth: 1,
+      overrideAccess: false,
+      user,
     })) as unknown as typeof z;
   } catch {
     notFound();

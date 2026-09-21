@@ -1,6 +1,7 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
+import { jestPelnymAdminem } from "@/collections/wspolne";
 
 /**
  * Decyzja o zgłoszeniu w trybie „Akceptowanie uczestników".
@@ -16,6 +17,12 @@ export async function POST(req: Request) {
   const payload = await getPayload({ config });
   const { user } = await payload.auth({ headers: req.headers });
   if (!user) return Response.json({ blad: "Wymagane logowanie." }, { status: 403 });
+  if (!jestPelnymAdminem(user)) {
+    return Response.json(
+      { blad: "Decyzje o zgłoszeniach wydaje wyłącznie pełny Administrator." },
+      { status: 403 },
+    );
+  }
 
   const { id, decyzja, komentarz } = (await req.json()) as {
     id?: number | string;

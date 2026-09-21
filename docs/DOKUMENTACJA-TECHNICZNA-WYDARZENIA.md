@@ -354,7 +354,49 @@ Przeniesione wzorce z modułu deklaracji strony głównej:
   odświeżyć `app/(payload)/admin/importMap.js`
   (`npx payload generate:importmap`).
 
-### 15.6. Otwarte pozycje audytu
+### 15.6. Role kont, powiadomienia i indywidualna treść potwierdzenia (21.09.2026)
+
+**Rola „Administrator jednego wydarzenia"** (pole `rola` + `wydarzenie`
+w kolekcji users; konta sprzed zmiany = `pelny`):
+
+- widzi WYŁĄCZNIE przypisane wydarzenie, jego zgłoszenia, załączniki
+  (nowe pole `wydarzenie` w zalaczniki-zgloszen, wypełniane przez
+  /api/zapisy; istniejące wiersze uzupełnione w migracji), karty PDF,
+  kartę wydarzenia w /panel i eksport CSV/XLSX (endpoint /api/eksport
+  przycina wynik przez `overrideAccess: false` + `user`);
+- zgłoszenia tylko do odczytu (create/update/delete = pełny Administrator);
+  /api/akceptacja i /api/przypomnienia zwracają 403; przyciski
+  Akceptuj/Odrzuć zastępuje komunikat;
+- w wydarzeniu edytuje wyłącznie `opis` — KAŻDE inne pole ma
+  `access: edytujeTylkoPelnyAdmin` (w panelu pola są wygaszone; żółty
+  baner `KomunikatRoli` — „Zmiana wymagana przez Administratora");
+  pola `rola`/`wydarzenie` na własnym koncie też są zablokowane
+  (potwierdzone E2E: próba PATCH roli nie zmienia wartości);
+- kolekcja Administratorzy i global Ustawienia ukryte i zablokowane.
+
+Helpery: `jestPelnymAdminem`, `idWydarzeniaKonta`, `tylkoPelnyAdmin`,
+`edytujeTylkoPelnyAdmin` w `collections/wspolne.ts`. Reguły `read`
+zwracają klauzule Where (adnotacja `boolean | Where` — bez niej TS
+nie skleja unii obiektów).
+
+**Powiadomienia o nowych zgłoszeniach** (wcześniej ich NIE było): pole
+`powiadomieniaAdresy` na wydarzeniu (tekst, kilka adresów po przecinku,
+domyślnie sekretarz@emdr.org.pl; puste = e-mail kontaktowy z Ustawień).
+/api/zapisy wysyła krótki e-mail: osoba, wydarzenie, status, link do
+zgłoszenia w panelu — bez danych szczegółowych (zostają w systemie).
+
+**Indywidualna treść potwierdzenia**: pole `trescPotwierdzenia`
+(textarea na końcu formularza wydarzenia) zastępuje standardowy akapit
+„dziękujemy za zgłoszenie…" w e-mailu do zgłaszającego; obsługuje
+akapity (pusta linia) i `**pogrubienia**`; powitanie, blok płatności,
+weryfikacji i link do profilu system dokleja zawsze. Puste = standard.
+
+Migracja: `20260921_134500_role_powiadomienia` (5×ALTER + backfill
+`wydarzenie_id` załączników z relacji zgłoszeń). E2E na produkcji
+(21.09, konto testowe usunięte): 12/12 testów izolacji i blokad,
+edycja opisu przez konto ograniczone, oba e-maile na żywo.
+
+### 15.7. Otwarte pozycje audytu
 
 Backup automatyczny z próbnym restore, monitoring uptime, role
 kont/MFA, audit-log operacji — wspólne z planem strony głównej

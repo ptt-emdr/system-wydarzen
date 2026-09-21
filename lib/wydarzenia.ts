@@ -39,6 +39,8 @@ export type WydarzenieDoc = {
     | null;
   zbierajDaneFaktury?: boolean;
   instrukcjaPlatnosci?: string | null;
+  powiadomieniaAdresy?: string | null;
+  trescPotwierdzenia?: string | null;
 };
 
 /** Cena obowiązująca w tej chwili: najwcześniejszy nieprzeterminowany próg albo cena bazowa. */

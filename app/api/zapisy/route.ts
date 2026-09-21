@@ -133,7 +133,9 @@ export async function POST(req: Request) {
           const bufor = Buffer.from(await plik.arrayBuffer());
           const utworzony = await payload.create({
             collection: "zalaczniki-zgloszen",
-            data: {},
+            /* odniesienie do wydarzenia — dzięki niemu administrator
+               jednego wydarzenia widzi tylko swoje załączniki */
+            data: { wydarzenie: Number(wydarzenieId) },
             file: {
               data: bufor,
               name: `${Date.now()}-${plik.name}`.replace(/[^a-zA-Z0-9._-]/g, "_"),
@@ -260,6 +262,24 @@ export async function POST(req: Request) {
              O wyniku weryfikacji poinformujemy osobnym e-mailem.</p>`
           : `<p>Udział w wydarzeniu jest bezpłatny — Twoje miejsce jest potwierdzone.</p>`;
 
+    /* wstęp e-maila: indywidualna treść z karty wydarzenia (jeśli jest)
+       zamiast standardowego „dziękujemy za zgłoszenie…"; reszta (płatność,
+       weryfikacja, link do zgłoszenia) zawsze doklejana przez system */
+    const wstepHtml = w.trescPotwierdzenia?.trim()
+      ? w.trescPotwierdzenia
+          .trim()
+          .split(/\n{2,}/)
+          .map(
+            (akapit) =>
+              `<p>${eskapujHtml(akapit)
+                .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+                .replace(/\n/g, "<br>")}</p>`,
+          )
+          .join("")
+      : `<p>dziękujemy za zgłoszenie na <b>${w.tytul}</b>${
+          wybrane.length ? ` (terminy: ${wybrane.join(", ")})` : ""
+        }.</p>`;
+
     try {
       await payload.sendEmail({
         to: email,
@@ -268,9 +288,7 @@ export async function POST(req: Request) {
           : `Zgłoszenie przyjęte: ${w.tytul}`,
         html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
           <p>Dzień dobry ${eskapujHtml(imie)},</p>
-          <p>dziękujemy za zgłoszenie na <b>${w.tytul}</b>${
-            wybrane.length ? ` (terminy: ${wybrane.join(", ")})` : ""
-          }.</p>
+          ${wstepHtml}
           ${platnoscHtml}
           ${weryfikacjaHtml}
           <p>Stan swojego zgłoszenia sprawdzisz tutaj:<br>
@@ -281,6 +299,41 @@ export async function POST(req: Request) {
       });
     } catch (e) {
       console.error("E-mail nie wyszedł (zgłoszenie zapisane):", e);
+    }
+
+    /* ---- powiadomienie obsługi o nowym zgłoszeniu (21.09.2026) ----
+       krótkie (bez danych szczegółowych — te zostają w systemie);
+       adresy z karty wydarzenia, domyślnie e-mail kontaktowy z Ustawień */
+    try {
+      const adresy = String(w.powiadomieniaAdresy || "")
+        .split(/[,;\s]+/)
+        .map((a) => a.trim())
+        .filter((a) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a));
+      const doObslugi = adresy.length
+        ? adresy
+        : [ustawienia.emailKontaktowy || "sekretarz@emdr.org.pl"];
+      const statusTekst = naListeRezerwowa
+        ? "lista rezerwowa"
+        : wymagaAkceptacji
+          ? "do akceptacji (weryfikacja)"
+          : kwotaNalezna > 0
+            ? "oczekuje na wpłatę"
+            : "potwierdzone (bezpłatne)";
+      await payload.sendEmail({
+        to: doObslugi.join(", "),
+        subject: `Nowe zgłoszenie: ${w.tytul}`,
+        html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#16303c;line-height:1.5">
+          <p>Wpłynęło nowe zgłoszenie na <b>${w.tytul}</b>.</p>
+          <p>Osoba: <b>${eskapujHtml(imie)} ${eskapujHtml(nazwisko)}</b><br>
+          Status: ${statusTekst}${
+            wybrane.length ? `<br>Terminy: ${wybrane.map(eskapujHtml).join(", ")}` : ""
+          }</p>
+          <p>Szczegóły w panelu:<br>
+          <a href="${bazaUrl}/admin/collections/zgloszenia/${zgloszenie.id}">${bazaUrl}/admin/collections/zgloszenia/${zgloszenie.id}</a></p>
+        </div>`,
+      });
+    } catch (e) {
+      console.error("Powiadomienie obsługi nie wyszło (zgłoszenie zapisane):", e);
     }
 
     return Response.json({
