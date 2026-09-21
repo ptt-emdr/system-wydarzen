@@ -120,15 +120,28 @@ export default async function KartaZgloszenia({
       }}
     >
       <style>{`
+        /* ---- podział na strony A4 ----
+           - krótkie sekcje (.sekcja) nigdy nie łamią się w środku:
+             jeżeli nie mieszczą się na stronie, przechodzą w całości,
+           - długa tabela odpowiedzi łamie się MIĘDZY wierszami,
+             a jej nagłówek powtarza się na każdej stronie,
+           - przy rozbudowanych formularzach (.nowa-strona) odpowiedzi
+             zaczynają się od świeżej strony */
         @media print {
           body { background: #fff !important; }
           .bez-druku { display: none !important; }
-          main { padding: 0 !important; }
-          h2 { break-after: avoid; }
+          main { padding: 0 !important; max-width: 100% !important; }
+          header { break-after: avoid; }
+          h2 { break-after: avoid; break-inside: avoid; }
+          .sekcja { break-inside: avoid; }
+          .nowa-strona { break-before: page; }
           tr { break-inside: avoid; }
+          thead { display: table-header-group; }
+          footer { break-inside: avoid; }
         }
         @page { size: A4; margin: 12mm; }
         table { border-collapse: collapse; width: 100%; }
+        td, th { word-break: break-word; }
       `}</style>
 
       <div className="bez-druku" style={{ textAlign: "right", marginBottom: "12px" }}>
@@ -146,26 +159,31 @@ export default async function KartaZgloszenia({
         </div>
       </header>
 
-      <h2 style={naglowek}>1. Wydarzenie</h2>
-      <table>
-        <tbody>
-          <Wiersz l="Nazwa wydarzenia" w={w?.tytul} />
-          <Wiersz l="Termin" w={terminWydarzenia || null} />
-          <Wiersz l="Miejsce" w={w?.miejsce} />
-          {terminy.length ? <Wiersz l="Wybrane terminy (cykl)" w={terminy.join("; ")} /> : null}
-        </tbody>
-      </table>
+      <section className="sekcja">
+        <h2 style={naglowek}>1. Wydarzenie</h2>
+        <table>
+          <tbody>
+            <Wiersz l="Nazwa wydarzenia" w={w?.tytul} />
+            <Wiersz l="Termin" w={terminWydarzenia || null} />
+            <Wiersz l="Miejsce" w={w?.miejsce} />
+            {terminy.length ? <Wiersz l="Wybrane terminy (cykl)" w={terminy.join("; ")} /> : null}
+          </tbody>
+        </table>
+      </section>
 
-      <h2 style={naglowek}>2. Dane uczestnika</h2>
-      <table>
-        <tbody>
-          <Wiersz l="Imię i nazwisko" w={`${z.imie || ""} ${z.nazwisko || ""}`.trim()} />
-          <Wiersz l="Adres e-mail" w={z.email} />
-          <Wiersz l="Telefon" w={z.telefon} />
-          <Wiersz l="Zgoda RODO" w={z.zgodaRodo ? "☑ TAK" : "☐ nie"} />
-        </tbody>
-      </table>
+      <section className="sekcja">
+        <h2 style={naglowek}>2. Dane uczestnika</h2>
+        <table>
+          <tbody>
+            <Wiersz l="Imię i nazwisko" w={`${z.imie || ""} ${z.nazwisko || ""}`.trim()} />
+            <Wiersz l="Adres e-mail" w={z.email} />
+            <Wiersz l="Telefon" w={z.telefon} />
+            <Wiersz l="Zgoda RODO" w={z.zgodaRodo ? "☑ TAK" : "☐ nie"} />
+          </tbody>
+        </table>
+      </section>
 
+      <section className="sekcja">
       <h2 style={naglowek}>3. Status i płatności</h2>
       <table>
         <tbody>
@@ -185,9 +203,10 @@ export default async function KartaZgloszenia({
           ) : null}
         </tbody>
       </table>
+      </section>
 
       {z.chceFakture ? (
-        <>
+        <section className="sekcja">
           <h2 style={naglowek}>4. Dane do faktury</h2>
           <table>
             <tbody>
@@ -196,35 +215,48 @@ export default async function KartaZgloszenia({
               <Wiersz l="Adres" w={z.faktura?.adres} />
             </tbody>
           </table>
-        </>
+        </section>
       ) : null}
 
-      <h2 style={naglowek}>{z.chceFakture ? "5" : "4"}. Odpowiedzi z formularza zgłoszeniowego</h2>
-      {odpowiedzi.length ? (
+      {/* rozbudowany formularz (rekrutacje) → odpowiedzi od nowej strony;
+          krótki formularz zostaje w miejscu, a tabela i tak łamie się
+          wyłącznie między wierszami */}
+      <section className={odpowiedzi.length > 12 ? "nowa-strona" : undefined}>
+        <h2 style={naglowek}>{z.chceFakture ? "5" : "4"}. Odpowiedzi z formularza zgłoszeniowego</h2>
+        {odpowiedzi.length ? (
+          <table>
+            <thead>
+              <tr>
+                <th style={{ ...etL, width: "45%", textAlign: "left" }}>Pole formularza</th>
+                <th style={{ ...etL, width: "55%", textAlign: "left" }}>Odpowiedź</th>
+              </tr>
+            </thead>
+            <tbody>
+              {odpowiedzi.map((o, i) => (
+                <tr key={i}>
+                  <td style={{ ...etL, width: "45%", fontWeight: 600 }}>{o.pytanie}</td>
+                  <td style={et}>{o.odpowiedz || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p style={{ margin: "4px 0", color: "#555" }}>Formularz nie zawierał dodatkowych pytań.</p>
+        )}
+      </section>
+
+      <section className="sekcja">
+        <h2 style={naglowek}>{z.chceFakture ? "6" : "5"}. Załączniki i decyzja</h2>
         <table>
           <tbody>
-            {odpowiedzi.map((o, i) => (
-              <tr key={i}>
-                <td style={{ ...etL, width: "45%", fontWeight: 600 }}>{o.pytanie}</td>
-                <td style={et}>{o.odpowiedz || "—"}</td>
-              </tr>
-            ))}
+            <Wiersz l="Załączone pliki" w={zalaczniki.length ? zalaczniki.join("; ") : "brak"} />
+            <tr>
+              <td style={etL}>Decyzja organizatora / podpis</td>
+              <td style={{ ...et, height: "52px" }}></td>
+            </tr>
           </tbody>
         </table>
-      ) : (
-        <p style={{ margin: "4px 0", color: "#555" }}>Formularz nie zawierał dodatkowych pytań.</p>
-      )}
-
-      <h2 style={naglowek}>{z.chceFakture ? "6" : "5"}. Załączniki i decyzja</h2>
-      <table>
-        <tbody>
-          <Wiersz l="Załączone pliki" w={zalaczniki.length ? zalaczniki.join("; ") : "brak"} />
-          <tr>
-            <td style={etL}>Decyzja organizatora / podpis</td>
-            <td style={{ ...et, height: "52px" }}></td>
-          </tr>
-        </tbody>
-      </table>
+      </section>
 
       <footer style={{ marginTop: "20px", paddingTop: "8px", borderTop: "1px solid #ddd", fontSize: "10.5px", color: "#777" }}>
         Dokument wygenerowany z systemu zapisów na wydarzenia Polskiego
