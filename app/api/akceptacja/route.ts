@@ -1,6 +1,6 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
+import { adresDoPytan, eskapujHtml, formatujKwote, stopkaPytan } from "@/lib/wydarzenia";
 import { jestPelnymAdminem } from "@/collections/wspolne";
 
 /**
@@ -53,14 +53,15 @@ export async function POST(req: Request) {
     id: typeof z.wydarzenie === "object" ? z.wydarzenie.id : z.wydarzenie,
     depth: 0,
     overrideAccess: true,
-  })) as { tytul: string; dniNaPlatnosc?: number };
+  })) as { tytul: string; dniNaPlatnosc?: number; powiadomieniaAdresy?: string | null };
   const u = (await payload.findGlobal({ slug: "ustawienia" })) as {
     rachunek?: { numer?: string; odbiorca?: string };
     emailKontaktowy?: string;
   };
+  const doPytan = adresDoPytan(w.powiadomieniaAdresy, u.emailKontaktowy);
   const bazaUrl = process.env.PUBLIC_URL || "http://localhost:3100";
   const stopka = `<p>Stan zgłoszenia: <a href="${bazaUrl}/profil/${id}/${z.token}">${bazaUrl}/profil/${id}/${z.token}</a></p>
-    <p>W razie pytań: ${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</p>`;
+    ${stopkaPytan(doPytan)}`;
 
   if (decyzja === "odrzuc") {
     await payload.update({
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
           na etapie weryfikacji.</p>
           <p><b>Powód:</b> ${eskapujHtml(komentarz!.trim())}</p>
           <p>Jeżeli chcesz to wyjaśnić lub uzupełnić dokumenty — napisz na
-          adres <a href="mailto:${u.emailKontaktowy || "sekretarz@emdr.org.pl"}">${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</a>.</p>
+          adres <a href="mailto:${doPytan}">${doPytan}</a>.</p>
           <p>Jeżeli rejestracja nie zostanie zamknięta pozytywnie,
           <b>otrzymasz zwrot wpłaconych środków</b>${
             wplacone > 0 ? ` (dotychczas wpłacono: ${formatujKwote(wplacone)})` : ""

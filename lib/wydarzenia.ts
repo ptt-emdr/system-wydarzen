@@ -43,6 +43,25 @@ export type WydarzenieDoc = {
   trescPotwierdzenia?: string | null;
 };
 
+/** Adres do pytań uczestników danego wydarzenia: pierwszy adres z pola
+    „Przesyłaj powiadomienia na adres”; gdy pole puste — e-mail kontaktowy
+    z Ustawień, a w ostateczności sekretarz. */
+export function adresDoPytan(
+  powiadomieniaAdresy?: string | null,
+  zUstawien?: string | null,
+): string {
+  const pierwszy = String(powiadomieniaAdresy || "")
+    .split(/[,;\s]+/)
+    .map((a) => a.trim())
+    .find((a) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a));
+  return pierwszy || zUstawien || "sekretarz@emdr.org.pl";
+}
+
+/** Stopka kontaktowa e-maili do uczestników (jednolita formuła). */
+export function stopkaPytan(adres: string): string {
+  return `<p>W przypadku dodatkowych pytań prosimy o kontakt na adres: <a href="mailto:${adres}">${adres}</a></p>`;
+}
+
 /** Cena obowiązująca w tej chwili: najwcześniejszy nieprzeterminowany próg albo cena bazowa. */
 export function aktualnaCena(w: WydarzenieDoc, teraz = new Date()): {
   cena: number;

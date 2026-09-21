@@ -6,6 +6,7 @@ import {
   zajetosc,
   formatujKwote,
   eskapujHtml,
+  adresDoPytan,
   type WydarzenieDoc,
 } from "@/lib/wydarzenia";
 
@@ -309,7 +310,7 @@ export async function POST(req: Request) {
           ${weryfikacjaHtml}
           <p>Stan swojego zgłoszenia sprawdzisz tutaj:<br>
           <a href="${linkProfilu}">${linkProfilu}</a></p>
-          <p>W razie pytań: ${ustawienia.emailKontaktowy || "sekretarz@emdr.org.pl"}<br>
+          <p>W przypadku dodatkowych pytań prosimy o kontakt na adres: <a href="mailto:${adresDoPytan(w.powiadomieniaAdresy, ustawienia.emailKontaktowy)}">${adresDoPytan(w.powiadomieniaAdresy, ustawienia.emailKontaktowy)}</a><br>
           ${ustawienia.organizator || "Polskie Towarzystwo Terapii EMDR"}</p>
         </div>`,
       });

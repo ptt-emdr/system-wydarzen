@@ -242,7 +242,9 @@ Na końcu formularza wydarzenia są dwa nowe pola:
   adresy przychodzi krótki e-mail o każdym nowym zgłoszeniu (kto,
   wydarzenie, status, link do zgłoszenia w panelu). Domyślnie
   sekretarz@emdr.org.pl; kilka adresów oddziel przecinkami, np.
-  `sekretarz@emdr.org.pl, dim@emdr.org.pl`.
+  `sekretarz@emdr.org.pl, dim@emdr.org.pl`. **Pierwszy adres z tej listy**
+  jest też podawany uczestnikom w e-mailach jako kontakt do pytań
+  („W przypadku dodatkowych pytań prosimy o kontakt na adres: …").
 - **„Indywidualna treść e-maila potwierdzenia (wstęp)"** — własny tekst,
   który zastępuje standardowe „dziękujemy za zgłoszenie…" w e-mailu do
   osoby zapisującej się. Pusta linia = nowy akapit, `**tekst**` =

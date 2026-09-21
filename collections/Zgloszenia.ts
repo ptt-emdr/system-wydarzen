@@ -1,7 +1,7 @@
 import type { CollectionConfig, Where } from "payload";
 import crypto from "crypto";
 import { idWydarzeniaKonta, jestPelnymAdminem, tylkoPelnyAdmin } from "./wspolne";
-import { eskapujHtml } from "../lib/wydarzenia";
+import { adresDoPytan, eskapujHtml, stopkaPytan } from "../lib/wydarzenia";
 
 /**
  * Zgłoszenia uczestników. Powstają WYŁĄCZNIE przez endpoint /api/zapisy
@@ -104,7 +104,7 @@ export const Zgloszenia: CollectionConfig = {
             id: typeof doc.wydarzenie === "object" ? doc.wydarzenie.id : doc.wydarzenie,
             depth: 0,
             overrideAccess: true,
-          })) as { tytul: string };
+          })) as { tytul: string; powiadomieniaAdresy?: string | null };
           const u = (await req.payload.findGlobal({ slug: "ustawienia" })) as {
             rachunek?: { numer?: string; odbiorca?: string };
             emailKontaktowy?: string;
@@ -130,7 +130,7 @@ export const Zgloszenia: CollectionConfig = {
                 <tr><td>Tytuł przelewu</td><td><b style="color:#ff370f">${doc.kodPlatnosci || ""}</b></td></tr>
               </table>
               <p>Brak wpłaty w terminie oznacza ponowne zwolnienie miejsca.</p>
-              <p>W razie pytań: ${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</p>
+              ${stopkaPytan(adresDoPytan(w.powiadomieniaAdresy, u.emailKontaktowy))}
             </div>`,
           });
         } catch (e) {

@@ -1,6 +1,6 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { eskapujHtml, formatujKwote } from "@/lib/wydarzenia";
+import { adresDoPytan, eskapujHtml, formatujKwote, stopkaPytan } from "@/lib/wydarzenia";
 import { jestPelnymAdminem } from "@/collections/wspolne";
 
 /**
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
           <p>Brak wpłaty w terminie oznacza zwolnienie miejsca. Jeżeli przelew
           został już wykonany — prosimy zignorować to przypomnienie.</p>
           <p>Stan zgłoszenia: <a href="${bazaUrl}/profil/${z.id}/${z.token}">${bazaUrl}/profil/${z.id}/${z.token}</a></p>
-          <p>W razie pytań: ${u.emailKontaktowy || "sekretarz@emdr.org.pl"}</p>
+          ${stopkaPytan(adresDoPytan((w as { powiadomieniaAdresy?: string | null }).powiadomieniaAdresy, u.emailKontaktowy))}
         </div>`,
       });
       wyslano++;
