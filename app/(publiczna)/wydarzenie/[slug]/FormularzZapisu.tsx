@@ -99,8 +99,21 @@ export function FormularzZapisu({ wydarzenie, klauzulaRodo, trybRezerwowy }: Pro
       dane.set("wydarzenieId", wydarzenie.id);
       dane.set("terminy", JSON.stringify(wybraneTerminy));
       const odp = await fetch("/api/zapisy", { method: "POST", body: dane });
-      const json = await odp.json();
-      if (!odp.ok) throw new Error(json.blad || "Nie udało się wysłać zgłoszenia.");
+      /* odpowiedź może nie być JSON-em (np. strona błędu serwera w oknie
+         wdrożenia) — bez tego zabezpieczenia Safari pokazywał kryptyczne
+         „The string did not match the expected pattern" */
+      let json: { blad?: string } | null = null;
+      try {
+        json = await odp.json();
+      } catch {
+        json = null;
+      }
+      if (!odp.ok || !json) {
+        throw new Error(
+          json?.blad ||
+            `Serwer chwilowo nie przyjął zgłoszenia (kod ${odp.status}). Odczekaj minutę i spróbuj ponownie — a jeżeli problem się powtórzy, napisz do organizatora.`,
+        );
+      }
       setOk(json as Potwierdzenie);
     } catch (err) {
       setBlad(err instanceof Error ? err.message : "Nie udało się wysłać zgłoszenia.");

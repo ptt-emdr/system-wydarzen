@@ -16,7 +16,9 @@ const zgloszeniaZIp = new Map<string, number[]>();
 function zaCzesto(ip: string): boolean {
   const teraz = Date.now();
   const okno = (zgloszeniaZIp.get(ip) ?? []).filter((t) => teraz - t < 3_600_000);
-  if (okno.length >= 5) return true;
+  /* 10/h — kilka osób z jednej instytucji (wspólne IP) może zgłaszać się
+     na rekrutację tego samego dnia; licznik zeruje się przy restarcie */
+  if (okno.length >= 10) return true;
   okno.push(teraz);
   zgloszeniaZIp.set(ip, okno);
   return false;
@@ -29,6 +31,9 @@ function zaCzesto(ip: string): boolean {
  * z instrukcją przelewu. Zwraca dane do ekranu potwierdzenia.
  */
 export async function POST(req: Request) {
+  /* załączniki zapisane zanim walidacja dalszych pól się wywali —
+     sprzątane przy każdym błędzie, żeby nie zostawały sieroty */
+  let sprzatnijZalaczniki: () => Promise<void> = async () => {};
   try {
     const dane = await req.formData();
     const payload = await getPayload({ config });
@@ -121,6 +126,13 @@ export async function POST(req: Request) {
     /* ---- odpowiedzi i załączniki wg kreatora pól ---- */
     const odpowiedzi: { pytanie: string; odpowiedz: string }[] = [];
     const zalacznikiIds: number[] = [];
+    sprzatnijZalaczniki = async () => {
+      for (const idZal of zalacznikiIds) {
+        try {
+          await payload.delete({ collection: "zalaczniki-zgloszen", id: idZal, overrideAccess: true });
+        } catch {}
+      }
+    };
     for (let i = 0; i < (w.pola || []).length; i++) {
       const p = (w.pola || [])[i];
       if (p.typ === "info") continue;
@@ -128,6 +140,7 @@ export async function POST(req: Request) {
         const plik = dane.get(`plik-${i}`);
         if (plik instanceof File && plik.size > 0) {
           if (plik.size > 10 * 1024 * 1024) {
+            await sprzatnijZalaczniki();
             return Response.json({ blad: `Załącznik „${p.etykieta}” przekracza 10 MB.` }, { status: 400 });
           }
           const bufor = Buffer.from(await plik.arrayBuffer());
@@ -147,6 +160,7 @@ export async function POST(req: Request) {
           zalacznikiIds.push(utworzony.id);
           odpowiedzi.push({ pytanie: p.etykieta, odpowiedz: `załącznik: ${plik.name}` });
         } else if (p.wymagane) {
+          await sprzatnijZalaczniki();
           return Response.json({ blad: `Załącznik „${p.etykieta}” jest wymagany.` }, { status: 400 });
         }
         continue;
@@ -157,6 +171,7 @@ export async function POST(req: Request) {
           .map((x) => String(x).trim())
           .filter(Boolean);
         if (p.wymagane && wartosci.length === 0) {
+          await sprzatnijZalaczniki();
           return Response.json({ blad: `Zaznacz co najmniej jedną odpowiedź w „${p.etykieta}”.` }, { status: 400 });
         }
         if (wartosci.length) odpowiedzi.push({ pytanie: p.etykieta, odpowiedz: wartosci.join("; ") });
@@ -164,6 +179,7 @@ export async function POST(req: Request) {
       }
       const wartosc = String(dane.get(`pole-${i}`) || "").trim();
       if (p.wymagane && !wartosc) {
+        await sprzatnijZalaczniki();
         return Response.json({ blad: `Pole „${p.etykieta}” jest wymagane.` }, { status: 400 });
       }
       if (wartosc) odpowiedzi.push({ pytanie: p.etykieta, odpowiedz: wartosc });
@@ -349,6 +365,9 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("Błąd przyjmowania zgłoszenia:", e);
+    try {
+      await sprzatnijZalaczniki();
+    } catch {}
     return Response.json(
       { blad: "Wystąpił błąd — spróbuj ponownie lub napisz do organizatora." },
       { status: 500 },
